@@ -1,9 +1,16 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using api.DTOs;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace api.Controllers
 {
@@ -12,80 +19,74 @@ namespace api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(UserContext context)
+        public UserController(UserContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
-        // GET: api/User
+        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public ActionResult SomeThingVau()
         {
-            return await _context.Users.ToListAsync();
+            return Ok();
         }
-
-        // GET: api/User/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(long id)
+        
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(RegisterDto registerDto)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null) return NotFound();
-
-            return user;
-        }
-
-        // PUT: api/User/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
-        {
-            if (id != user.Id) return BadRequest();
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
+            _context.Users.Add(new User
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+                Id = 0,
+                Password = registerDto.Password,
+                PhoneNumber = registerDto.PhoneNumber,
+                Username = registerDto.Username
+            });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult> LogIn(LoginDto loginDto)
+        {
+            var identity = await GetClaimsIdentity(loginDto.Username, loginDto.Password);
+            if (identity == null) return BadRequest(new {errorText = "Invalid username or password."});
+
+            var dateTimeNow = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                _configuration["Jwt:Issuer"],
+                _configuration["Jwt:Issuer"],
+                notBefore: dateTimeNow,
+                claims: identity.Claims,
+                expires: dateTimeNow.AddHours(2),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+ 
+            var response = new
             {
-                if (!UserExists(id))
-                    return NotFound();
-                throw;
-            }
-
-            return NoContent();
+                access_token = encodedJwt,
+                username = identity.Name
+            };
+            
+            return Ok(response);
         }
 
-        // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        private async Task<ClaimsIdentity> GetClaimsIdentity(string username, string password)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
 
-            return CreatedAtAction(nameof(GetUser), new {id = user.Id}, user);
-        }
+            if (user == null) return null;
 
-        // DELETE: api/User/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(long id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
+            var claims = new List<Claim>
+            {
+                new(ClaimsIdentity.DefaultNameClaimType, user.Username)
+            };
+            var claimsIdentity = new ClaimsIdentity(claims, "JWT", ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool UserExists(long id)
-        {
-            return _context.Users.Any(e => e.Id == id);
+            return claimsIdentity;
         }
     }
 }
