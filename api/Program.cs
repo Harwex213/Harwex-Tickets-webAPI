@@ -14,12 +14,12 @@ namespace api
 
             using (var scope = host.Services.CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetRequiredService<UserContext>())
+                using (var context = scope.ServiceProvider.GetRequiredService<HarwexTicketsApiContext>())
                 {
                     context.Database.Migrate();
                 }
             }
-            
+
             host.Run();
         }
 
