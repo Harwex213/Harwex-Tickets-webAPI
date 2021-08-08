@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
-using api.DTOs;
 using api.Models;
+using api.Models.Requests;
+using api.Models.Responses;
+using api.Services;
+using api.Services.PasswordHashers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace api.Controllers
 {
@@ -18,75 +15,75 @@ namespace api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly AccessTokenGenerator _accessTokenGenerator;
         private readonly UserContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserController(UserContext context, IConfiguration configuration)
+        public UserController(UserContext context, IPasswordHasher passwordHasher,
+            AccessTokenGenerator accessTokenGenerator)
         {
             _context = context;
-            _configuration = configuration;
+            _passwordHasher = passwordHasher;
+            _accessTokenGenerator = accessTokenGenerator;
         }
 
         [Authorize]
         [HttpGet]
-        public ActionResult SomeThingVau()
+        public IActionResult SomeThingVau()
         {
             return Ok();
         }
-        
+
         [HttpPost("register")]
-        public async Task<ActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register(RegisterRequest registerRequest)
         {
+            if (!ModelState.IsValid) return BadRequestModelState();
+
+            if (registerRequest.Password != registerRequest.ConfirmPassword)
+                return BadRequest(new ErrorResponse("Password does not match confirm password."));
+
+            var existingUserByUsername =
+                await _context.Users.FirstOrDefaultAsync(u => u.Username == registerRequest.Username);
+            if (existingUserByUsername != null) return Conflict(new ErrorResponse("Username already exists."));
+
+            var existingUserByPhoneNumber =
+                await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == registerRequest.PhoneNumber);
+            if (existingUserByPhoneNumber != null) return Conflict(new ErrorResponse("Phone Number already taken."));
+
+
             _context.Users.Add(new User
             {
                 Id = 0,
-                Password = registerDto.Password,
-                PhoneNumber = registerDto.PhoneNumber,
-                Username = registerDto.Username
+                Username = registerRequest.Username,
+                PhoneNumber = registerRequest.PhoneNumber,
+                PasswordHash = _passwordHasher.HashPassword(registerRequest.Password)
             });
             await _context.SaveChangesAsync();
+
             return Ok();
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> LogIn(LoginDto loginDto)
+        public async Task<IActionResult> LogIn(LoginRequest loginRequest)
         {
-            var identity = await GetClaimsIdentity(loginDto.Username, loginDto.Password);
-            if (identity == null) return BadRequest(new {errorText = "Invalid username or password."});
+            if (!ModelState.IsValid) return BadRequestModelState();
 
-            var dateTimeNow = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Issuer"],
-                notBefore: dateTimeNow,
-                claims: identity.Claims,
-                expires: dateTimeNow.AddHours(2),
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
- 
-            var response = new
-            {
-                access_token = encodedJwt,
-                username = identity.Name
-            };
-            
-            return Ok(response);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginRequest.Username);
+            if (user == null) return Unauthorized();
+
+            var isCorrectPassword = _passwordHasher.VerifyPassword(loginRequest.Password, user.PasswordHash);
+            if (!isCorrectPassword) return Unauthorized();
+
+            var accessToken = _accessTokenGenerator.GenerateToken(user);
+
+            return Ok(new LoginResponse {AccessToken = accessToken});
         }
 
-        private async Task<ClaimsIdentity> GetClaimsIdentity(string username, string password)
+        private IActionResult BadRequestModelState()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
+            var errorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
 
-            if (user == null) return null;
-
-            var claims = new List<Claim>
-            {
-                new(ClaimsIdentity.DefaultNameClaimType, user.Username)
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, "JWT", ClaimsIdentity.DefaultNameClaimType,
-                ClaimsIdentity.DefaultRoleClaimType);
-
-            return claimsIdentity;
+            return BadRequest(new ErrorResponse(errorMessages));
         }
     }
 }

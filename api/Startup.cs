@@ -1,5 +1,8 @@
+using System;
 using System.Text;
 using api.Models;
+using api.Services;
+using api.Services.PasswordHashers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,26 +29,34 @@ namespace api
         {
             services.AddControllers();
 
+            var authenticationConfiguration = new AuthenticationConfiguration();
+            Configuration.Bind("Authentication", authenticationConfiguration);
+            
+            services.AddSingleton(authenticationConfiguration);
+            services.AddSingleton<AccessTokenGenerator>();
+            services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
+
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<UserContext>(opt => opt.UseSqlServer(connectionString));
-            
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)    
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
-                    
-                    options.TokenValidationParameters = new TokenValidationParameters    
-                    {    
-                        ValidateIssuer = true,    
-                        ValidateAudience = true,    
-                        ValidateLifetime = true,    
-                        ValidateIssuerSigningKey = true,    
-                        ValidIssuer = Configuration["Jwt:Issuer"],    
-                        ValidAudience = Configuration["Jwt:Issuer"],    
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))    
-                    };    
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ClockSkew = TimeSpan.Zero,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = authenticationConfiguration.Issuer,
+                        ValidAudience = authenticationConfiguration.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret))
+                    };
                 });
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "HarwexTicketsAPI", Version = "v1"});
