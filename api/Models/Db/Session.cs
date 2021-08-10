@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace api.Models
 {
@@ -6,10 +7,9 @@ namespace api.Models
     {
         public Guid Id { get; set; }
         public Guid HallId { get; set; }
-        public Guid CinemaMovieId { get; set; }
         public DateTime Time { get; set; }
         
         public virtual Hall Hall { get; set; }
-        public virtual CinemaMovie CinemaMovie { get; set; }
+        public virtual ICollection<SessionSeatPrice> SessionSeatPrices { get; set; }
     }
 }

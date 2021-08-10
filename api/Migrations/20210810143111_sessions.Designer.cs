@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210810143111_sessions")]
+    partial class sessions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,16 +172,6 @@ namespace api.Migrations
                     b.ToTable("SeatTypes");
                 });
 
-            modelBuilder.Entity("api.Models.Service", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Services");
-                });
-
             modelBuilder.Entity("api.Models.Session", b =>
                 {
                     b.Property<Guid>("Id")
@@ -225,31 +217,7 @@ namespace api.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("SessionSeatPrices");
-                });
-
-            modelBuilder.Entity("api.Models.SessionService", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("money");
-
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceName");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("SessionServices");
+                    b.ToTable("SessionSeatPrice");
                 });
 
             modelBuilder.Entity("api.Models.User", b =>
@@ -347,29 +315,12 @@ namespace api.Migrations
                         .HasForeignKey("SeatType");
 
                     b.HasOne("api.Models.Session", "Session")
-                        .WithMany("SessionSeatPrices")
+                        .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("SeatTypeNavigation");
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("api.Models.SessionService", b =>
-                {
-                    b.HasOne("api.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceName");
-
-                    b.HasOne("api.Models.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
 
                     b.Navigation("Session");
                 });
@@ -418,11 +369,6 @@ namespace api.Migrations
                 {
                     b.Navigation("Seats");
 
-                    b.Navigation("SessionSeatPrices");
-                });
-
-            modelBuilder.Entity("api.Models.Session", b =>
-                {
                     b.Navigation("SessionSeatPrices");
                 });
 #pragma warning restore 612, 618

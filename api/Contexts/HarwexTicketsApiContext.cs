@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace api.Models
 {
@@ -18,30 +19,63 @@ namespace api.Models
         public DbSet<Seat> Seats { get; set; }
         public DbSet<SeatType> SeatTypes { get; set; }
         public DbSet<Session> Sessions { get; set; }
+        public DbSet<SessionSeatPrice> SessionSeatPrices { get; set; }
+        public DbSet<SessionService> SessionServices { get; set; }
+        public DbSet<Service> Services { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(builder =>
-            {
-                builder.HasOne(d => d.UserRoleNavigation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.Role)
-                    .HasPrincipalKey(t => t.Name)
-                    .HasConstraintName("FK_User_Role");
-            });
+            modelBuilder.Entity<User>(UserConfigure);
 
-            modelBuilder.Entity<Seat>(builder =>
-            {
-                builder.HasOne(d => d.SeatType)
-                    .WithMany(p => p.Seats)
-                    .HasForeignKey(d => d.Type)
-                    .HasPrincipalKey(t => t.Name);
-            });
+            modelBuilder.Entity<Seat>(SeatConfigure);
+            modelBuilder.Entity<SeatType>(SeatTypeConfigure);
             
-            modelBuilder.Entity<SeatType>(builder =>
-            {
-                builder.HasKey(s => s.Name);
-            });
+            modelBuilder.Entity<SessionSeatPrice>(SessionSeatPriceConfigure);
+            modelBuilder.Entity<SessionService>(SessionServiceConfigure);
+            
+            modelBuilder.Entity<Service>(ServiceConfigure);
+        }
+
+        private void UserConfigure(EntityTypeBuilder<User> builder)
+        {
+            builder.HasOne(d => d.UserRoleNavigation)
+                .WithMany(p => p.Users)
+                .HasForeignKey(d => d.Role)
+                .HasPrincipalKey(t => t.Name)
+                .HasConstraintName("FK_User_Role");
+        }
+
+        private void SeatConfigure(EntityTypeBuilder<Seat> builder)
+        {
+            builder.HasOne(d => d.SeatTypeNavigation)
+                .WithMany(p => p.Seats)
+                .HasForeignKey(d => d.SeatType)
+                .HasPrincipalKey(t => t.Name);
+        }
+        
+        private void SeatTypeConfigure(EntityTypeBuilder<SeatType> builder)
+        {
+            builder.HasKey(s => s.Name);
+        }
+        
+        private void SessionSeatPriceConfigure(EntityTypeBuilder<SessionSeatPrice> builder)
+        {
+            builder.Property(e => e.Price).HasColumnType("money");
+                
+            builder.HasOne(d => d.SeatTypeNavigation)
+                .WithMany(p => p.SessionSeatPrices)
+                .HasForeignKey(d => d.SeatType)
+                .HasPrincipalKey(t => t.Name);
+        }
+        
+        private void SessionServiceConfigure(EntityTypeBuilder<SessionService> builder)
+        {
+            builder.Property(e => e.Price).HasColumnType("money");
+        }
+        
+        private void ServiceConfigure(EntityTypeBuilder<Service> builder)
+        {
+            builder.HasKey(s => s.Name);
         }
     }
 }

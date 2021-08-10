@@ -7,5 +7,6 @@ namespace api.Models
         public string Name { get; set; }
         
         public virtual ICollection<Seat> Seats { get; set; }
+        public virtual ICollection<SessionSeatPrice> SessionSeatPrices { get; set; }
     }
 }

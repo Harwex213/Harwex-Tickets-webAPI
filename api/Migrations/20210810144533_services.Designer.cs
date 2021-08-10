@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210810144533_services")]
+    partial class services
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,17 +239,13 @@ namespace api.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
 
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServiceName");
-
-                    b.HasIndex("SessionId");
 
                     b.ToTable("SessionServices");
                 });
@@ -353,23 +351,6 @@ namespace api.Migrations
                         .IsRequired();
 
                     b.Navigation("SeatTypeNavigation");
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("api.Models.SessionService", b =>
-                {
-                    b.HasOne("api.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceName");
-
-                    b.HasOne("api.Models.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
 
                     b.Navigation("Session");
                 });
