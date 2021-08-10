@@ -10,5 +10,6 @@ namespace api.Models
         
         public virtual Cinema Cinema { get; set; }
         public virtual ICollection<Seat> Seats { get; set; }
+        public virtual ICollection<Session> Sessions { get; set; }
     }
 }
