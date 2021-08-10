@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210810131655_seats")]
+    partial class seats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,14 +150,17 @@ namespace api.Migrations
                     b.Property<int>("Row")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("SeatTypeName")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HallId");
 
-                    b.HasIndex("Type");
+                    b.HasIndex("SeatTypeName");
 
                     b.ToTable("Seats");
                 });
@@ -236,7 +241,7 @@ namespace api.Migrations
 
                     b.HasOne("api.Models.SeatType", "SeatType")
                         .WithMany("Seats")
-                        .HasForeignKey("Type");
+                        .HasForeignKey("SeatTypeName");
 
                     b.Navigation("Hall");
 

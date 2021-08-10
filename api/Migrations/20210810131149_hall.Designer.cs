@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210810131149_hall")]
+    partial class hall
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +78,7 @@ namespace api.Migrations
 
                     b.HasIndex("CinemaId");
 
-                    b.ToTable("Halls");
+                    b.ToTable("Hall");
                 });
 
             modelBuilder.Entity("api.Models.Movie", b =>
@@ -131,43 +133,6 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("api.Models.Seat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HallId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Row")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HallId");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("Seats");
-                });
-
-            modelBuilder.Entity("api.Models.SeatType", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("SeatTypes");
                 });
 
             modelBuilder.Entity("api.Models.User", b =>
@@ -226,23 +191,6 @@ namespace api.Migrations
                     b.Navigation("Cinema");
                 });
 
-            modelBuilder.Entity("api.Models.Seat", b =>
-                {
-                    b.HasOne("api.Models.Hall", "Hall")
-                        .WithMany("Seats")
-                        .HasForeignKey("HallId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.SeatType", "SeatType")
-                        .WithMany("Seats")
-                        .HasForeignKey("Type");
-
-                    b.Navigation("Hall");
-
-                    b.Navigation("SeatType");
-                });
-
             modelBuilder.Entity("api.Models.User", b =>
                 {
                     b.HasOne("api.Models.Role", "UserRoleNavigation")
@@ -261,11 +209,6 @@ namespace api.Migrations
                     b.Navigation("Halls");
                 });
 
-            modelBuilder.Entity("api.Models.Hall", b =>
-                {
-                    b.Navigation("Seats");
-                });
-
             modelBuilder.Entity("api.Models.Movie", b =>
                 {
                     b.Navigation("CinemaMovies");
@@ -274,11 +217,6 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("api.Models.SeatType", b =>
-                {
-                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }
