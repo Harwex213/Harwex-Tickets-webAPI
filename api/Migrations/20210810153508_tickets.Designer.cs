@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210810153508_tickets")]
+    partial class tickets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,10 +254,10 @@ namespace api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SessionSeatPriceId")
+                    b.Property<Guid?>("SeatId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SessionServiceId")
+                    b.Property<Guid>("SessionSeatPriceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("UserId")
@@ -263,13 +265,13 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SessionSeatPriceId");
+                    b.HasIndex("SeatId");
 
-                    b.HasIndex("SessionServiceId");
+                    b.HasIndex("SessionSeatPriceId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Ticket");
                 });
 
             modelBuilder.Entity("api.Models.User", b =>
@@ -396,15 +398,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Ticket", b =>
                 {
+                    b.HasOne("api.Models.Seat", null)
+                        .WithMany("Tickets")
+                        .HasForeignKey("SeatId");
+
                     b.HasOne("api.Models.SessionSeatPrice", "SessionSeatPrice")
                         .WithMany("Tickets")
                         .HasForeignKey("SessionSeatPriceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.SessionService", "SessionService")
-                        .WithMany()
-                        .HasForeignKey("SessionServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -415,8 +415,6 @@ namespace api.Migrations
                         .IsRequired();
 
                     b.Navigation("SessionSeatPrice");
-
-                    b.Navigation("SessionService");
 
                     b.Navigation("User");
                 });
@@ -457,6 +455,11 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Role", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("api.Models.Seat", b =>
+                {
+                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("api.Models.SeatType", b =>

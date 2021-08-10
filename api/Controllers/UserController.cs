@@ -64,11 +64,11 @@ namespace api.Controllers
 
             _harwexTicketsApiContext.Users.Add(new User
             {
-                Id = 0,
+                Id = default,
                 Username = registerRequest.Username,
                 PhoneNumber = registerRequest.PhoneNumber,
                 PasswordHash = _passwordHasher.HashPassword(registerRequest.Password),
-                Role = "user"
+                RoleName = "user"
             });
             await _harwexTicketsApiContext.SaveChangesAsync();
 

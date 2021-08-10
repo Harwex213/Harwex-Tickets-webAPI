@@ -22,29 +22,31 @@ namespace api.Models
         public DbSet<SessionSeatPrice> SessionSeatPrices { get; set; }
         public DbSet<SessionService> SessionServices { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(UserConfigure);
+            modelBuilder.Entity<Role>(RoleConfigure);
 
             modelBuilder.Entity<Seat>(SeatConfigure);
             modelBuilder.Entity<SeatType>(SeatTypeConfigure);
-            
+
             modelBuilder.Entity<SessionSeatPrice>(SessionSeatPriceConfigure);
             modelBuilder.Entity<SessionService>(SessionServiceConfigure);
-            
+
             modelBuilder.Entity<Service>(ServiceConfigure);
         }
 
         private void UserConfigure(EntityTypeBuilder<User> builder)
         {
-            builder.HasOne(d => d.UserRoleNavigation)
-                .WithMany(p => p.Users)
-                .HasForeignKey(d => d.Role)
-                .HasPrincipalKey(t => t.Name)
-                .HasConstraintName("FK_User_Role");
         }
 
+        private void RoleConfigure(EntityTypeBuilder<Role> builder)
+        {
+            builder.HasKey(s => s.Name);
+        }
+        
         private void SeatConfigure(EntityTypeBuilder<Seat> builder)
         {
             builder.HasOne(d => d.SeatTypeNavigation)
@@ -52,27 +54,27 @@ namespace api.Models
                 .HasForeignKey(d => d.SeatType)
                 .HasPrincipalKey(t => t.Name);
         }
-        
+
         private void SeatTypeConfigure(EntityTypeBuilder<SeatType> builder)
         {
             builder.HasKey(s => s.Name);
         }
-        
+
         private void SessionSeatPriceConfigure(EntityTypeBuilder<SessionSeatPrice> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
-                
+
             builder.HasOne(d => d.SeatTypeNavigation)
                 .WithMany(p => p.SessionSeatPrices)
                 .HasForeignKey(d => d.SeatType)
                 .HasPrincipalKey(t => t.Name);
         }
-        
+
         private void SessionServiceConfigure(EntityTypeBuilder<SessionService> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
         }
-        
+
         private void ServiceConfigure(EntityTypeBuilder<Service> builder)
         {
             builder.HasKey(s => s.Name);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace api.Models
 {
@@ -11,5 +12,6 @@ namespace api.Models
         
         public virtual Session Session { get; set; }
         public virtual SeatType SeatTypeNavigation { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }
