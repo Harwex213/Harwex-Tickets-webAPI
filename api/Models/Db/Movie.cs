@@ -5,7 +5,7 @@ namespace api.Models
 {
     public class Movie
     {
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
         public TimeSpan Duration { get; set; }
         public string Genre { get; set; }

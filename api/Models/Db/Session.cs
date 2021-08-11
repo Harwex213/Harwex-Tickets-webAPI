@@ -5,8 +5,8 @@ namespace api.Models
 {
     public class Session
     {
-        public Guid Id { get; set; }
-        public Guid HallId { get; set; }
+        public long Id { get; set; }
+        public long HallId { get; set; }
         public DateTime Time { get; set; }
         
         public virtual Hall Hall { get; set; }

@@ -22,7 +22,6 @@ namespace api.Models
         public DbSet<SessionSeatPrice> SessionSeatPrices { get; set; }
         public DbSet<SessionService> SessionServices { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

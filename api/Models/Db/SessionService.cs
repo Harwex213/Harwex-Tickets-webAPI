@@ -5,8 +5,8 @@ namespace api.Models
 {
     public class SessionService
     {
-        public Guid Id { get; set; }
-        public Guid SessionId { get; set; }
+        public long Id { get; set; }
+        public long SessionId { get; set; }
         public string ServiceName { get; set; }
         public decimal Price { get; set; }
 

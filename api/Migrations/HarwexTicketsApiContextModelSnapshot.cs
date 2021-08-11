@@ -21,12 +21,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Cinema", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("CityId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("CityId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -38,18 +39,19 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.CinemaMovie", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("CinemaId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("CinemaId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("MovieId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("MovieId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -65,12 +67,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Hall", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("CinemaId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("CinemaId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -81,9 +84,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Movie", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
@@ -129,12 +133,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Seat", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("HallId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("HallId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -176,15 +181,16 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Session", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid?>("CinemaMovieId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("CinemaMovieId")
+                        .HasColumnType("bigint");
 
-                    b.Property<Guid>("HallId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("HallId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
@@ -200,9 +206,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.SessionSeatPrice", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
@@ -210,8 +217,8 @@ namespace api.Migrations
                     b.Property<string>("SeatType")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("SessionId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -224,9 +231,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.SessionService", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
@@ -234,8 +242,8 @@ namespace api.Migrations
                     b.Property<string>("ServiceName")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("SessionId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -244,32 +252,6 @@ namespace api.Migrations
                     b.HasIndex("SessionId");
 
                     b.ToTable("SessionServices");
-                });
-
-            modelBuilder.Entity("api.Models.Ticket", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SessionSeatPriceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SessionServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionSeatPriceId");
-
-                    b.HasIndex("SessionServiceId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("api.Models.User", b =>
@@ -394,33 +376,6 @@ namespace api.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("api.Models.Ticket", b =>
-                {
-                    b.HasOne("api.Models.SessionSeatPrice", "SessionSeatPrice")
-                        .WithMany("Tickets")
-                        .HasForeignKey("SessionSeatPriceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.SessionService", "SessionService")
-                        .WithMany()
-                        .HasForeignKey("SessionServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.User", "User")
-                        .WithMany("Tickets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SessionSeatPrice");
-
-                    b.Navigation("SessionService");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("api.Models.User", b =>
                 {
                     b.HasOne("api.Models.Role", "Role")
@@ -469,16 +424,6 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Session", b =>
                 {
                     b.Navigation("SessionSeatPrices");
-                });
-
-            modelBuilder.Entity("api.Models.SessionSeatPrice", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("api.Models.User", b =>
-                {
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }

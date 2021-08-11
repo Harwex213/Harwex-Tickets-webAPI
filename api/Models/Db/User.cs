@@ -12,6 +12,5 @@ namespace api.Models
         public string RoleName { get; set; }
         
         public virtual Role Role { get; set; }
-        public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }
