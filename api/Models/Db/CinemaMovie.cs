@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using api.Models.Abstract;
 
 namespace api.Models
 {
-    public class CinemaMovie
+    public class CinemaMovie : BaseEntity
     {
-        public long Id { get; set; }
         public long CinemaId { get; set; }
         public long MovieId { get; set; }
         public DateTime StartDate { get; set; }

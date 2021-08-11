@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace api.Models
@@ -11,8 +12,8 @@ namespace api.Models
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
+        public DbSet<City> Cities { get; set; }
         public DbSet<Movie> Movies { get; set; }
         public DbSet<CinemaMovie> CinemaMovies { get; set; }
         public DbSet<Hall> Halls { get; set; }
@@ -22,61 +23,32 @@ namespace api.Models
         public DbSet<SessionSeatPrice> SessionSeatPrices { get; set; }
         public DbSet<SessionService> SessionServices { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(UserConfigure);
-            modelBuilder.Entity<Role>(RoleConfigure);
+            var cascadeFKs = modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetForeignKeys())
+                .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Seat>(SeatConfigure);
-            modelBuilder.Entity<SeatType>(SeatTypeConfigure);
+            foreach (var fk in cascadeFKs)
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
+
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<SessionSeatPrice>(SessionSeatPriceConfigure);
             modelBuilder.Entity<SessionService>(SessionServiceConfigure);
-
-            modelBuilder.Entity<Service>(ServiceConfigure);
-        }
-
-        private void UserConfigure(EntityTypeBuilder<User> builder)
-        {
-        }
-
-        private void RoleConfigure(EntityTypeBuilder<Role> builder)
-        {
-            builder.HasKey(s => s.Name);
-        }
-        
-        private void SeatConfigure(EntityTypeBuilder<Seat> builder)
-        {
-            builder.HasOne(d => d.SeatTypeNavigation)
-                .WithMany(p => p.Seats)
-                .HasForeignKey(d => d.SeatType)
-                .HasPrincipalKey(t => t.Name);
-        }
-
-        private void SeatTypeConfigure(EntityTypeBuilder<SeatType> builder)
-        {
-            builder.HasKey(s => s.Name);
         }
 
         private void SessionSeatPriceConfigure(EntityTypeBuilder<SessionSeatPrice> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
-
-            builder.HasOne(d => d.SeatTypeNavigation)
-                .WithMany(p => p.SessionSeatPrices)
-                .HasForeignKey(d => d.SeatType)
-                .HasPrincipalKey(t => t.Name);
         }
 
         private void SessionServiceConfigure(EntityTypeBuilder<SessionService> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
-        }
-
-        private void ServiceConfigure(EntityTypeBuilder<Service> builder)
-        {
-            builder.HasKey(s => s.Name);
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using api.Models.Abstract;
 
 namespace api.Models
 {
-    public class City
+    public class City : BaseEntity
     {
-        public long Id { get; set; }
         public string Name { get; set; }
         public string Region { get; set; }
+        
+        public virtual ICollection<Cinema> Cinemas { get; set; }
     }
 }

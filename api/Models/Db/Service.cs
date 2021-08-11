@@ -1,7 +1,8 @@
-﻿namespace api.Models
+﻿using api.Models.Abstract;
+
+namespace api.Models
 {
-    public class Service
+    public class Service : BaseTypeEntity
     {
-        public string Name { get; set; }
     }
 }

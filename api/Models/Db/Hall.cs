@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using api.Models.Abstract;
 
 namespace api.Models
 {
-    public class Hall
+    public class Hall : BaseEntity
     {
-        public long Id { get; set; }
         public long CinemaId { get; set; }
         
         public virtual Cinema Cinema { get; set; }

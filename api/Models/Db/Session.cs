@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using api.Models.Abstract;
 
 namespace api.Models
 {
-    public class Session
+    public class Session : BaseEntity
     {
-        public long Id { get; set; }
         public long HallId { get; set; }
         public DateTime Time { get; set; }
         
