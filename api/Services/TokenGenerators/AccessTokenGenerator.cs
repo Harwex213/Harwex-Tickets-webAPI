@@ -22,7 +22,7 @@ namespace api.Services
             {
                 new("id", user.Id.ToString()),
                 new(ClaimsIdentity.DefaultNameClaimType, user.Username),
-                new(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+                new(ClaimsIdentity.DefaultRoleClaimType, user.RoleName)
             };
 
             return _tokenGenerator.Generate(

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 namespace api.Migrations
 {
     [DbContext(typeof(HarwexTicketsApiContext))]
-    partial class HarwexTicketsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210811102715_city")]
+    partial class city
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,8 +41,6 @@ namespace api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CityId");
 
                     b.ToTable("Cinemas");
                 });
@@ -422,17 +422,6 @@ namespace api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("api.Models.Cinema", b =>
-                {
-                    b.HasOne("api.Models.City", "City")
-                        .WithMany("Cinemas")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("City");
-                });
-
             modelBuilder.Entity("api.Models.CinemaMovie", b =>
                 {
                     b.HasOne("api.Models.Cinema", "Cinema")
@@ -583,11 +572,6 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.CinemaMovie", b =>
                 {
                     b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("api.Models.City", b =>
-                {
-                    b.Navigation("Cinemas");
                 });
 
             modelBuilder.Entity("api.Models.Hall", b =>

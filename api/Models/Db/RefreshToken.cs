@@ -1,8 +1,9 @@
-﻿namespace api.Models
+﻿using api.Models.Abstract;
+
+namespace api.Models
 {
-    public class RefreshToken
+    public class RefreshToken : BaseEntity
     {
-        public long Id { get; set; }
         public string Token { get; set; }
         public long UserId { get; set; }
     }
