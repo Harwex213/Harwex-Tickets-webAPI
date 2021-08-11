@@ -6,6 +6,11 @@ namespace api.Models
 {
     public class Movie : BaseEntity
     {
+        public Movie()
+        {
+            CinemaMovies = new List<CinemaMovie>();
+        }
+        
         public string Name { get; set; }
         public TimeSpan Duration { get; set; }
         public string Genre { get; set; }

@@ -6,6 +6,11 @@ namespace api.Models
 {
     public class CinemaMovie : BaseEntity
     {
+        public CinemaMovie()
+        {
+            Sessions = new List<Session>();
+        }
+        
         public long CinemaId { get; set; }
         public long MovieId { get; set; }
         public DateTime StartDate { get; set; }

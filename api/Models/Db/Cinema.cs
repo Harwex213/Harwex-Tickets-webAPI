@@ -6,6 +6,12 @@ namespace api.Models
 {
     public class Cinema : BaseEntity
     {
+        public Cinema()
+        {
+            CinemaMovies = new List<CinemaMovie>();
+            Halls = new List<Hall>();
+        }
+        
         public string Name { get; set; }
         public long CityId { get; set; }
         

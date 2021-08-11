@@ -5,6 +5,11 @@ namespace api.Models
 {
     public class SessionService : BaseEntity
     {
+        public SessionService()
+        {
+            Tickets = new List<Ticket>();
+        }
+        
         public long SessionId { get; set; }
         public string ServiceName { get; set; }
         public decimal Price { get; set; }

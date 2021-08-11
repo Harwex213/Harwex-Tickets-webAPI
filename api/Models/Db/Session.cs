@@ -6,6 +6,12 @@ namespace api.Models
 {
     public class Session : BaseEntity
     {
+        public Session()
+        {
+            SessionServices = new List<SessionService>();
+            SessionSeatPrices = new List<SessionSeatPrice>();
+        }
+        
         public long HallId { get; set; }
         public DateTime Time { get; set; }
         

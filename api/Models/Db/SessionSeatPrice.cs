@@ -7,6 +7,11 @@ namespace api.Models
 {
     public class SessionSeatPrice : BaseEntity
     {
+        public SessionSeatPrice()
+        {
+            Tickets = new List<Ticket>();
+        }
+        
         public long SessionId { get; set; }
         public string SeatTypeName { get; set; }
         public decimal Price { get; set; }
