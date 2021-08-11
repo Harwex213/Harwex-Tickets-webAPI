@@ -6,12 +6,11 @@ namespace api.Models
     public class Seat : BaseEntity
     {
         public long HallId { get; set; }
-        public string SeatType { get; set; }
+        public string SeatTypeName { get; set; }
         public int Row { get; set; }
         public int Position { get; set; }
 
-        public virtual Hall Hall { get; set; }
-
-        [ForeignKey("SeatType")] public virtual SeatType SeatTypeNavigation { get; set; }
+        public virtual Hall Hall { get; set; } 
+        public virtual SeatType SeatType { get; set; }
     }
 }

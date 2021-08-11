@@ -179,8 +179,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Role", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -188,7 +190,11 @@ namespace api.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Roles");
                 });
@@ -215,22 +221,24 @@ namespace api.Migrations
                     b.Property<int>("Row")
                         .HasColumnType("int");
 
-                    b.Property<string>("SeatType")
+                    b.Property<string>("SeatTypeName")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HallId");
 
-                    b.HasIndex("SeatType");
+                    b.HasIndex("SeatTypeName");
 
                     b.ToTable("Seats");
                 });
 
             modelBuilder.Entity("api.Models.SeatType", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -238,15 +246,21 @@ namespace api.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("SeatTypes");
                 });
 
             modelBuilder.Entity("api.Models.Service", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -254,7 +268,11 @@ namespace api.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Services");
                 });
@@ -306,7 +324,7 @@ namespace api.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
 
-                    b.Property<string>("SeatType")
+                    b.Property<string>("SeatTypeName")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<long>("SessionId")
@@ -314,7 +332,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SeatType");
+                    b.HasIndex("SeatTypeName");
 
                     b.HasIndex("SessionId");
 
@@ -471,13 +489,14 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("api.Models.SeatType", "SeatTypeNavigation")
+                    b.HasOne("api.Models.SeatType", "SeatType")
                         .WithMany("Seats")
-                        .HasForeignKey("SeatType");
+                        .HasForeignKey("SeatTypeName")
+                        .HasPrincipalKey("Name");
 
                     b.Navigation("Hall");
 
-                    b.Navigation("SeatTypeNavigation");
+                    b.Navigation("SeatType");
                 });
 
             modelBuilder.Entity("api.Models.Session", b =>
@@ -497,9 +516,10 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.SessionSeatPrice", b =>
                 {
-                    b.HasOne("api.Models.SeatType", "SeatTypeNavigation")
+                    b.HasOne("api.Models.SeatType", "SeatType")
                         .WithMany("SessionSeatPrices")
-                        .HasForeignKey("SeatType");
+                        .HasForeignKey("SeatTypeName")
+                        .HasPrincipalKey("Name");
 
                     b.HasOne("api.Models.Session", "Session")
                         .WithMany("SessionSeatPrices")
@@ -507,7 +527,7 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("SeatTypeNavigation");
+                    b.Navigation("SeatType");
 
                     b.Navigation("Session");
                 });
@@ -515,11 +535,12 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.SessionService", b =>
                 {
                     b.HasOne("api.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceName");
+                        .WithMany("SessionServices")
+                        .HasForeignKey("ServiceName")
+                        .HasPrincipalKey("Name");
 
                     b.HasOne("api.Models.Session", "Session")
-                        .WithMany()
+                        .WithMany("SessionServices")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -568,7 +589,8 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Models.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleName");
+                        .HasForeignKey("RoleName")
+                        .HasPrincipalKey("Name");
 
                     b.Navigation("Role");
                 });
@@ -614,9 +636,16 @@ namespace api.Migrations
                     b.Navigation("SessionSeatPrices");
                 });
 
+            modelBuilder.Entity("api.Models.Service", b =>
+                {
+                    b.Navigation("SessionServices");
+                });
+
             modelBuilder.Entity("api.Models.Session", b =>
                 {
                     b.Navigation("SessionSeatPrices");
+
+                    b.Navigation("SessionServices");
                 });
 
             modelBuilder.Entity("api.Models.SessionSeatPrice", b =>

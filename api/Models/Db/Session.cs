@@ -11,5 +11,6 @@ namespace api.Models
         
         public virtual Hall Hall { get; set; }
         public virtual ICollection<SessionSeatPrice> SessionSeatPrices { get; set; }
+        public virtual ICollection<SessionService> SessionServices { get; set; }
     }
 }

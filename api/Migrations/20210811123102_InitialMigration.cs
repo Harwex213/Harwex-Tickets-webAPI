@@ -3,22 +3,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace api.Migrations
 {
-    public partial class initialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Cinemas",
+                name: "Cities",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CityId = table.Column<long>(type: "bigint", nullable: false)
+                    Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cinemas", x => x.Id);
+                    table.PrimaryKey("PK_Cities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -29,7 +31,9 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Duration = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Genre = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Genre = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,7 +47,9 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<long>(type: "bigint", nullable: false)
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,51 +60,93 @@ namespace api.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.Name);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                    table.UniqueConstraint("AK_Roles_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "SeatTypes",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SeatTypes", x => x.Name);
+                    table.PrimaryKey("PK_SeatTypes", x => x.Id);
+                    table.UniqueConstraint("AK_SeatTypes_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Services",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Services", x => x.Name);
+                    table.PrimaryKey("PK_Services", x => x.Id);
+                    table.UniqueConstraint("AK_Services_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Halls",
+                name: "Cinemas",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CinemaId = table.Column<long>(type: "bigint", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CityId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Halls", x => x.Id);
+                    table.PrimaryKey("PK_Cinemas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Halls_Cinemas_CinemaId",
-                        column: x => x.CinemaId,
-                        principalTable: "Cinemas",
+                        name: "FK_Cinemas_Cities_CityId",
+                        column: x => x.CityId,
+                        principalTable: "Cities",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RoleName = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleName",
+                        column: x => x.RoleName,
+                        principalTable: "Roles",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -111,7 +159,9 @@ namespace api.Migrations
                     CinemaId = table.Column<long>(type: "bigint", nullable: false),
                     MovieId = table.Column<long>(type: "bigint", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,24 +181,23 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Halls",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RoleName = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CinemaId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Halls", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RoleName",
-                        column: x => x.RoleName,
-                        principalTable: "Roles",
-                        principalColumn: "Name",
+                        name: "FK_Halls_Cinemas_CinemaId",
+                        column: x => x.CinemaId,
+                        principalTable: "Cinemas",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -159,9 +208,11 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HallId = table.Column<long>(type: "bigint", nullable: false),
-                    SeatType = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SeatTypeName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Row = table.Column<int>(type: "int", nullable: false),
-                    Position = table.Column<int>(type: "int", nullable: false)
+                    Position = table.Column<int>(type: "int", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,8 +224,8 @@ namespace api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Seats_SeatTypes_SeatType",
-                        column: x => x.SeatType,
+                        name: "FK_Seats_SeatTypes_SeatTypeName",
+                        column: x => x.SeatTypeName,
                         principalTable: "SeatTypes",
                         principalColumn: "Name",
                         onDelete: ReferentialAction.Restrict);
@@ -188,7 +239,9 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HallId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CinemaMovieId = table.Column<long>(type: "bigint", nullable: true)
+                    CinemaMovieId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -214,15 +267,17 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SessionId = table.Column<long>(type: "bigint", nullable: false),
-                    SeatType = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Price = table.Column<decimal>(type: "money", nullable: false)
+                    SeatTypeName = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Price = table.Column<decimal>(type: "money", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SessionSeatPrices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SessionSeatPrices_SeatTypes_SeatType",
-                        column: x => x.SeatType,
+                        name: "FK_SessionSeatPrices_SeatTypes_SeatTypeName",
+                        column: x => x.SeatTypeName,
                         principalTable: "SeatTypes",
                         principalColumn: "Name",
                         onDelete: ReferentialAction.Restrict);
@@ -242,7 +297,9 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SessionId = table.Column<long>(type: "bigint", nullable: false),
                     ServiceName = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Price = table.Column<decimal>(type: "money", nullable: false)
+                    Price = table.Column<decimal>(type: "money", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -268,11 +325,21 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SessionServiceId = table.Column<long>(type: "bigint", nullable: false),
-                    SessionSeatPriceId = table.Column<long>(type: "bigint", nullable: false)
+                    SessionSeatPriceId = table.Column<long>(type: "bigint", nullable: false),
+                    SeatId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tickets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tickets_Seats_SeatId",
+                        column: x => x.SeatId,
+                        principalTable: "Seats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Tickets_SessionSeatPrices_SessionSeatPriceId",
                         column: x => x.SessionSeatPriceId,
@@ -283,6 +350,12 @@ namespace api.Migrations
                         name: "FK_Tickets_SessionServices_SessionServiceId",
                         column: x => x.SessionServiceId,
                         principalTable: "SessionServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Tickets_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -298,6 +371,11 @@ namespace api.Migrations
                 column: "MovieId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cinemas_CityId",
+                table: "Cinemas",
+                column: "CityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Halls_CinemaId",
                 table: "Halls",
                 column: "CinemaId");
@@ -308,9 +386,9 @@ namespace api.Migrations
                 column: "HallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Seats_SeatType",
+                name: "IX_Seats_SeatTypeName",
                 table: "Seats",
-                column: "SeatType");
+                column: "SeatTypeName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_CinemaMovieId",
@@ -323,9 +401,9 @@ namespace api.Migrations
                 column: "HallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SessionSeatPrices_SeatType",
+                name: "IX_SessionSeatPrices_SeatTypeName",
                 table: "SessionSeatPrices",
-                column: "SeatType");
+                column: "SeatTypeName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SessionSeatPrices_SessionId",
@@ -343,6 +421,11 @@ namespace api.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tickets_SeatId",
+                table: "Tickets",
+                column: "SeatId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tickets_SessionSeatPriceId",
                 table: "Tickets",
                 column: "SessionSeatPriceId");
@@ -351,6 +434,11 @@ namespace api.Migrations
                 name: "IX_Tickets_SessionServiceId",
                 table: "Tickets",
                 column: "SessionServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_UserId",
+                table: "Tickets",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleName",
@@ -364,13 +452,10 @@ namespace api.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Seats");
-
-            migrationBuilder.DropTable(
                 name: "Tickets");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Seats");
 
             migrationBuilder.DropTable(
                 name: "SessionSeatPrices");
@@ -379,7 +464,7 @@ namespace api.Migrations
                 name: "SessionServices");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "SeatTypes");
@@ -389,6 +474,9 @@ namespace api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "CinemaMovies");
@@ -401,6 +489,9 @@ namespace api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cinemas");
+
+            migrationBuilder.DropTable(
+                name: "Cities");
         }
     }
 }

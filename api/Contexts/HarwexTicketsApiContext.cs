@@ -37,18 +37,48 @@ namespace api.Models
 
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<User>(UserConfigure);
+            
+            modelBuilder.Entity<Seat>(SeatConfigure);
+            
             modelBuilder.Entity<SessionSeatPrice>(SessionSeatPriceConfigure);
             modelBuilder.Entity<SessionService>(SessionServiceConfigure);
+        }
+        
+        private void UserConfigure(EntityTypeBuilder<User> builder)
+        {
+            builder.HasOne(d => d.Role)
+                .WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleName)
+                .HasPrincipalKey(t => t.Name);
+        }
+        
+        private void SeatConfigure(EntityTypeBuilder<Seat> builder)
+        {
+            builder.HasOne(d => d.SeatType)
+                .WithMany(p => p.Seats)
+                .HasForeignKey(d => d.SeatTypeName)
+                .HasPrincipalKey(t => t.Name);
         }
 
         private void SessionSeatPriceConfigure(EntityTypeBuilder<SessionSeatPrice> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
+            
+            builder.HasOne(d => d.SeatType)
+                .WithMany(p => p.SessionSeatPrices)
+                .HasForeignKey(d => d.SeatTypeName)
+                .HasPrincipalKey(t => t.Name);
         }
 
         private void SessionServiceConfigure(EntityTypeBuilder<SessionService> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
+
+            builder.HasOne(d => d.Service)
+                .WithMany(p => p.SessionServices)
+                .HasForeignKey(d => d.ServiceName)
+                .HasPrincipalKey(t => t.Name);
         }
     }
 }
