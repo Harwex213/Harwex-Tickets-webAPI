@@ -32,10 +32,7 @@ namespace api.Controllers
         {
             var movie = await _context.Movies.FindAsync(id);
 
-            if (movie == null)
-            {
-                return NotFound();
-            }
+            if (movie == null) return NotFound();
 
             return movie;
         }
@@ -46,10 +43,7 @@ namespace api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(long id, Movie movie)
         {
-            if (id != movie.Id)
-            {
-                return BadRequest();
-            }
+            if (id != movie.Id) return BadRequest();
 
             _context.Entry(movie).State = EntityState.Modified;
 
@@ -60,13 +54,8 @@ namespace api.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!MovieExists(id))
-                {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -81,7 +70,7 @@ namespace api.Controllers
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetMovie), new { id = movie.Id }, movie);
+            return CreatedAtAction(nameof(GetMovie), new {id = movie.Id}, movie);
         }
 
         // DELETE: api/Movies/5
@@ -90,10 +79,7 @@ namespace api.Controllers
         public async Task<IActionResult> DeleteMovie(long id)
         {
             var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
+            if (movie == null) return NotFound();
 
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();

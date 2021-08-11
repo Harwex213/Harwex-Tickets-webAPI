@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api.Models;
 
 namespace api.Controllers
 {
@@ -33,10 +31,7 @@ namespace api.Controllers
         {
             var cinemaMovie = await _context.CinemaMovies.FindAsync(id);
 
-            if (cinemaMovie == null)
-            {
-                return NotFound();
-            }
+            if (cinemaMovie == null) return NotFound();
 
             return cinemaMovie;
         }
@@ -46,10 +41,7 @@ namespace api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCinemaMovie(long id, CinemaMovie cinemaMovie)
         {
-            if (id != cinemaMovie.Id)
-            {
-                return BadRequest();
-            }
+            if (id != cinemaMovie.Id) return BadRequest();
 
             _context.Entry(cinemaMovie).State = EntityState.Modified;
 
@@ -60,13 +52,8 @@ namespace api.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!CinemaMovieExists(id))
-                {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -80,7 +67,7 @@ namespace api.Controllers
             _context.CinemaMovies.Add(cinemaMovie);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCinemaMovie", new { id = cinemaMovie.Id }, cinemaMovie);
+            return CreatedAtAction(nameof(GetCinemaMovie), new {id = cinemaMovie.Id}, cinemaMovie);
         }
 
         // DELETE: api/CinemaMovies/5
@@ -88,10 +75,7 @@ namespace api.Controllers
         public async Task<IActionResult> DeleteCinemaMovie(long id)
         {
             var cinemaMovie = await _context.CinemaMovies.FindAsync(id);
-            if (cinemaMovie == null)
-            {
-                return NotFound();
-            }
+            if (cinemaMovie == null) return NotFound();
 
             _context.CinemaMovies.Remove(cinemaMovie);
             await _context.SaveChangesAsync();
