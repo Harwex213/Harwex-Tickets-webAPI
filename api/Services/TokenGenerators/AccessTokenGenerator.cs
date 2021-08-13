@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using api.Models;
 using api.Services.TokenGenerators;
+using Domain.Entities;
 
 namespace api.Services
 {

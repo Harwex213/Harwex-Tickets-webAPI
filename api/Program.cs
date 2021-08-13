@@ -1,4 +1,4 @@
-using api.Models;
+using Infrastucture;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +14,7 @@ namespace api
 
             using (var scope = host.Services.CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetRequiredService<HarwexTicketsApiContext>())
+                using (var context = scope.ServiceProvider.GetRequiredService<AppDbContext>())
                 {
                     context.Database.Migrate();
                 }

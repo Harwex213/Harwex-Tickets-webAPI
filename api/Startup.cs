@@ -1,10 +1,12 @@
 using System;
 using System.Text;
+using api.Extensions;
 using api.Models;
 using api.Services;
 using api.Services.PasswordHashers;
 using api.Services.TokenGenerators;
 using api.Services.TokenValidators;
+using Infrastucture;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +31,12 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddDatabase(Configuration);
+            services.AddServices();
+            services.AddAutoMapper(typeof(ApiMappingProfile));
             services.AddControllers();
+
 
             var authenticationConfiguration = new AuthenticationConfiguration();
             Configuration.Bind("Authentication", authenticationConfiguration);
@@ -40,9 +47,6 @@ namespace api
             services.AddSingleton<TokenGenerator>();
             services.AddSingleton(authenticationConfiguration);
             services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<HarwexTicketsApiContext>(opt => opt.UseSqlServer(connectionString));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

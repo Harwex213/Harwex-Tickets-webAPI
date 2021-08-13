@@ -1,10 +1,12 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using api.Models;
-using Microsoft.AspNetCore.Authorization;
+using api.ViewModel;
+using AutoMapper;
+using Domain.Entities;
+using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Service.Exceptions;
 
 namespace api.Controllers
 {
@@ -12,84 +14,95 @@ namespace api.Controllers
     [ApiController]
     public class CinemasController : ControllerBase
     {
-        private readonly HarwexTicketsApiContext _context;
+        private readonly IMapper _cinemasMapper;
+        private readonly ICinemasService _cinemasService;
 
-        public CinemasController(HarwexTicketsApiContext context)
+        public CinemasController(ICinemasService cinemasService, IMapper cinemasMapper)
         {
-            _context = context;
+            _cinemasService = cinemasService;
+            _cinemasMapper = cinemasMapper;
         }
 
         // GET: api/Cinemas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cinema>>> GetCinemas()
+        public IActionResult GetCinemas()
         {
-            return await _context.Cinemas.ToListAsync();
+            try
+            {
+                var cinemas = _cinemasService.GetAll();
+                return Ok(cinemas.Select(cinema => _cinemasMapper.Map<CinemaGetResponse>(cinema)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
         }
 
         // GET: api/Cinemas/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Cinema>> GetCinema(long id)
+        [HttpGet("{id:long}")]
+        public IActionResult GetCinema(long id)
         {
-            var cinema = await _context.Cinemas.FindAsync(id);
-
-            if (cinema == null) return NotFound();
-
-            return cinema;
-        }
-
-        // PUT: api/Cinemas/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize(Roles = "admin")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCinema(long id, Cinema cinema)
-        {
-            if (id != cinema.Id) return BadRequest();
-
-            _context.Entry(cinema).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var cinema = _cinemasService.Get(id);
+                if (cinema == null) return NotFound();
+                return Ok(_cinemasMapper.Map<CinemaGetResponse>(cinema));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!CinemaExists(id))
-                    return NotFound();
-                throw;
+                return BadRequest();
             }
-
-            return NoContent();
         }
 
         // POST: api/Cinemas
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<ActionResult<Cinema>> PostCinema(Cinema cinema)
+        public async Task<IActionResult> PostCinema([FromBody] CinemaCreateRequest cinemaCreateRequest)
         {
-            _context.Cinemas.Add(cinema);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var cinema = _cinemasMapper.Map<Cinema>(cinemaCreateRequest);
+                await _cinemasService.AddAsync(cinema);
+                var response = CreatedAtAction(nameof(GetCinema), new {id = cinema.Id},
+                    _cinemasMapper.Map<CinemaCreateResponse>(cinema));
+                return response;
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+        }
 
-            return CreatedAtAction(nameof(GetCinema), new {id = cinema.Id}, cinema);
+        // PUT: api/Cinemas/5
+        [HttpPut("{id:long}")]
+        public async Task<IActionResult> PutCinema(long id, [FromBody] CinemaUpdateRequest cinemaUpdateRequest)
+        {
+            try
+            {
+                if (id != cinemaUpdateRequest.Id) return BadRequest();
+                var cinema = _cinemasMapper.Map<Cinema>(cinemaUpdateRequest);
+                await _cinemasService.UpdateAsync(cinema);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE: api/Cinemas/5
-        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCinema(long id)
+        public async Task<IActionResult> DeleteCinema(int id)
         {
-            var cinema = await _context.Cinemas.FindAsync(id);
-            if (cinema == null) return NotFound();
-
-            _context.Cinemas.Remove(cinema);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool CinemaExists(long id)
-        {
-            return _context.Cinemas.Any(e => e.Id == id);
+            try
+            {
+                await _cinemasService.DeleteAsync(id);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                if (e is NotFoundException) return NotFound();
+                return BadRequest();
+            }
         }
     }
 }

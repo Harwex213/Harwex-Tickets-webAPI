@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="10.1.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.8" />
@@ -20,7 +22,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Migrations" />
+      <ProjectReference Include="..\Infrastucture\Infrastucture.csproj" />
+      <ProjectReference Include="..\Service\Service.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers" />
     </ItemGroup>
 
 </Project>

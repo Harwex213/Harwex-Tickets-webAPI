@@ -7,10 +7,10 @@ namespace Infrastucture
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private DbContext DbContext { get; }
+        private AppDbContext DbContext { get; }
         private Dictionary<string, object> Repositories { get; }
 
-        public UnitOfWork(DbContext dbContext)
+        public UnitOfWork(AppDbContext dbContext)
         {
             DbContext = dbContext;
             Repositories = new Dictionary<string, dynamic>();
