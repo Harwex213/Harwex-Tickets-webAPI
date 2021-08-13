@@ -1,10 +1,13 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using api.ViewModel;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Service.Exceptions;
 
 namespace api.Controllers
 {
@@ -29,10 +32,23 @@ namespace api.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult LogIn(AuthLoginRequest loginRequest)
+        public async Task<IActionResult> LogIn(AuthLoginRequest loginRequest)
         {
-            _authService.LogIn(loginRequest.Username, loginRequest.Password);
-            return Ok();
+            try
+            {
+                var (accessToken, refreshToken) =
+                    await _authService.LogIn(loginRequest.Username, loginRequest.Password);
+                return Ok(new AuthAuthenticatedResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                });
+            }
+            catch (Exception e)
+            {
+                if (e is UnauthorizedException) return Unauthorized();
+                return BadRequest();
+            }
         }
 
         [Authorize]
@@ -46,9 +62,9 @@ namespace api.Controllers
         }
 
         [HttpPost("refresh")]
-        public IActionResult Refresh(AuthRefreshRequest refreshRequest)
+        public async Task<IActionResult> Refresh(AuthRefreshRequest refreshRequest)
         {
-            var (accessToken, refreshToken) = _authService.Refresh(refreshRequest.RefreshToken);
+            var (accessToken, refreshToken) = await _authService.Refresh(refreshRequest.RefreshToken);
             return Ok(new AuthAuthenticatedResponse
             {
                 AccessToken = accessToken,

@@ -1,28 +1,85 @@
-﻿using Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Domain.Entities;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
+using Service.Exceptions;
 
 namespace Service.Services
 {
     public class AuthService : IAuthService
     {
-        public void Register(User user)
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IRefreshTokenValidator _refreshTokenValidator;
+        private readonly ITokensGenerator _tokensGenerator;
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AuthService(ITokensGenerator tokensGenerator, IRefreshTokenValidator refreshTokenValidator,
+            IUnitOfWork unitOfWork)
         {
-            throw new System.NotImplementedException();
+            _tokensGenerator = tokensGenerator;
+            _refreshTokenValidator = refreshTokenValidator;
+            _unitOfWork = unitOfWork;
         }
 
-        public void LogIn(string username, string password)
+        public void Register(User user)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public async Task<(string accessToken, string refreshToken)> LogIn(string username, string password)
+        {
+            var user = _unitOfWork.Repository<User>().List(u => u.Username == username).FirstOrDefault();
+            if (user == null) throw new UnauthorizedException();
+
+            var isCorrectPassword = _passwordHasher.VerifyPassword(password, user.PasswordHash);
+            if (!isCorrectPassword) throw new UnauthorizedException();
+
+            return await GenerateTokens(user);
         }
 
         public void LogOut(long userId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public (string accessToken, string refreshToken) Refresh(string refreshToken)
+        public async Task<(string accessToken, string refreshToken)> Refresh(string refreshToken)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        private async Task<(string accessToken, string refreshToken)> GenerateTokens(User user, RefreshToken refreshToken = null)
+        {
+            var claims = new List<Claim>
+            {
+                new("id", user.Id.ToString()),
+                new(ClaimsIdentity.DefaultNameClaimType, user.Username),
+                new(ClaimsIdentity.DefaultRoleClaimType, user.RoleName)
+            };
+
+            var accessTokenString = _tokensGenerator.GenerateAccessToken(claims);
+            var refreshTokenString = _tokensGenerator.GenerateRefreshToken();
+            refreshToken ??= _unitOfWork.Repository<RefreshToken>().List(t => t.UserId == user.Id).FirstOrDefault();
+
+            if (refreshToken != null)
+            {
+                _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
+            }
+            
+            _unitOfWork.Repository<RefreshToken>().Add(new RefreshToken
+            {
+                Id = default,
+                Token = refreshTokenString,
+                UserId = user.Id,
+                IsDeleted = false
+            });
+
+            await _unitOfWork.CommitAsync();
+            
+            return (accessTokenString, refreshTokenString);
         }
     }
 }

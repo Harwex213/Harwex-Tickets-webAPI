@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace api.Models.Responses
+namespace api.ViewModel
 {
     public class ErrorResponse
     {
