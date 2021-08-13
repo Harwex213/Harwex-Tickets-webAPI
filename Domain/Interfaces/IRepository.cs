@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 
 namespace Domain.Interfaces
 {
@@ -9,6 +7,7 @@ namespace Domain.Interfaces
         void Add(T entity);
         void Delete(T entity);
         void Update(T entity);
-        IQueryable<T> List(Expression<Func<T, bool>> expression);
+        T Find(params object[] keys);
+        IList<T> GetAll();
     }
 }

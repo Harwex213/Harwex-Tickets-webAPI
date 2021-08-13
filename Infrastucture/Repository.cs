@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +10,13 @@ namespace Infrastucture
         private readonly DbContext _dbContext;
         private DbSet<T> _dbSet;
 
-        private DbSet<T> DbSet => _dbSet ??= _dbContext.Set<T>();
-
         public Repository(DbContext dbContext)
         {
             _dbContext = dbContext;
         }
-        
+
+        private DbSet<T> DbSet => _dbSet ??= _dbContext.Set<T>();
+
         public void Add(T entity)
         {
             DbSet.Add(entity);
@@ -33,9 +32,14 @@ namespace Infrastucture
             DbSet.Update(entity);
         }
 
-        public IQueryable<T> List(Expression<Func<T, bool>> expression)
+        public T Find(params object[] keys)
         {
-            return DbSet.Where(expression);
+            return DbSet.Find(keys);
+        }
+
+        public IList<T> GetAll()
+        {
+            return DbSet.ToList();
         }
     }
 }
