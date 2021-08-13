@@ -1,9 +1,16 @@
-﻿using Domain.Interfaces;
+﻿using System;
+using System.Text;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
+using Domain.Models;
 using Infrastucture;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Service.JwtTokens;
+using Service.PasswordHashers;
 using Service.Services;
 
 namespace api.Extensions
@@ -21,10 +28,43 @@ namespace api.Extensions
 
             return services;
         }
+        
+        public static IServiceCollection AddJwtTokenAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSingleton<ITokensGenerator, JwtTokensGenerator>();
+            services.AddSingleton<IRefreshTokenValidator, JwtRefreshTokenValidator>();
+            services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
+            
+            var authenticationConfiguration = new AuthenticationConfiguration();
+            configuration.Bind("Authentication", authenticationConfiguration);
+            
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret)),
+                        ValidIssuer = authenticationConfiguration.Issuer,
+                        ValidAudience = authenticationConfiguration.Audience,
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            return services;
+        }
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICinemasService, CinemaService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

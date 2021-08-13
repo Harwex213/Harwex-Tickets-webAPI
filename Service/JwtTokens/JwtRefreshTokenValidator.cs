@@ -1,18 +1,21 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using api.Models;
+using Domain.Interfaces;
+using Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace api.Services.TokenValidators
+namespace Service.JwtTokens
 {
-    public class RefreshTokenValidator
+    public class JwtRefreshTokenValidator : IRefreshTokenValidator
     {
         private readonly AuthenticationConfiguration _configuration;
 
-        public RefreshTokenValidator(AuthenticationConfiguration configuration)
+        public JwtRefreshTokenValidator(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = new AuthenticationConfiguration();
+            configuration.Bind("Authentication", _configuration);
         }
 
         public bool Validate(string refreshToken)

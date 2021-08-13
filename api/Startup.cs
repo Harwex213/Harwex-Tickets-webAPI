@@ -1,18 +1,10 @@
-using System;
-using System.Text;
 using api.Extensions;
-using Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Service.PasswordHashers;
-using Service.TokenGenerators;
-using Service.TokenValidators;
 
 namespace api
 {
@@ -28,41 +20,12 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDatabase(Configuration);
-            services.AddServices();
-            services.AddAutoMapper(typeof(ApiMappingProfile));
             services.AddControllers();
 
-
-            var authenticationConfiguration = new AuthenticationConfiguration();
-            Configuration.Bind("Authentication", authenticationConfiguration);
-
-            services.AddSingleton<AccessTokenGenerator>();
-            services.AddSingleton<RefreshTokenGenerator>();
-            services.AddSingleton<RefreshTokenValidator>();
-            services.AddSingleton<TokenGenerator>();
-            services.AddSingleton(authenticationConfiguration);
-            services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret)),
-                        ValidIssuer = authenticationConfiguration.Issuer,
-                        ValidAudience = authenticationConfiguration.Audience,
-                        ValidateIssuerSigningKey = true,
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
+            services.AddDatabase(Configuration);
+            services.AddJwtTokenAuthentication(Configuration);
+            services.AddServices();
+            services.AddAutoMapper(typeof(ApiMappingProfile));
 
             services.AddSwaggerGen(c =>
             {
