@@ -5,10 +5,10 @@ namespace Domain.Interfaces.Services
 {
     public interface ICrudService<TEntity>
     {
-        public Task Add(TEntity entity);
-        public Task Delete(long entityId);
-        public Task Update(TEntity entity);
-        public TEntity Get(int entityId);
+        public Task AddAsync(TEntity entity);
+        public Task DeleteAsync(long entityId);
+        public Task UpdateAsync(TEntity entity);
+        public TEntity Get(long entityId);
         public IList<TEntity> GetAll();
     }
 }
