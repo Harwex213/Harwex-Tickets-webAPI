@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +42,11 @@ namespace Infrastucture
         public IList<T> GetAll()
         {
             return DbSet.ToList();
+        }
+        
+        public IQueryable<T> List(Expression<Func<T, bool>> expression)
+        {
+            return DbSet.Where(expression);
         }
     }
 }
