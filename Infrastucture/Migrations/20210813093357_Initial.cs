@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace api.Migrations
+namespace Infrastucture.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,6 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -32,7 +31,6 @@ namespace api.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Duration = table.Column<TimeSpan>(type: "time", nullable: false),
                     Genre = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -48,7 +46,6 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -63,7 +60,6 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -79,7 +75,6 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -95,7 +90,6 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -112,7 +106,6 @@ namespace api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CityId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -136,7 +129,6 @@ namespace api.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RoleName = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -160,7 +152,6 @@ namespace api.Migrations
                     MovieId = table.Column<long>(type: "bigint", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -187,7 +178,6 @@ namespace api.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CinemaId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -211,7 +201,6 @@ namespace api.Migrations
                     SeatTypeName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Row = table.Column<int>(type: "int", nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -240,7 +229,6 @@ namespace api.Migrations
                     HallId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CinemaMovieId = table.Column<long>(type: "bigint", nullable: true),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -269,7 +257,6 @@ namespace api.Migrations
                     SessionId = table.Column<long>(type: "bigint", nullable: false),
                     SeatTypeName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Price = table.Column<decimal>(type: "money", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -298,7 +285,6 @@ namespace api.Migrations
                     SessionId = table.Column<long>(type: "bigint", nullable: false),
                     ServiceName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Price = table.Column<decimal>(type: "money", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -328,7 +314,6 @@ namespace api.Migrations
                     SessionSeatPriceId = table.Column<long>(type: "bigint", nullable: false),
                     SeatId = table.Column<long>(type: "bigint", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
