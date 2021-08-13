@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
+using Service.Exceptions;
 
 namespace Service
 {
@@ -15,26 +16,30 @@ namespace Service
             _unitOfWork = unitOfWork;
         }
 
-        public virtual async Task Add(TEntity entity)
+        public virtual async Task AddAsync(TEntity entity)
         {
             _unitOfWork.Repository<TEntity>().Add(entity);
             await _unitOfWork.CommitAsync();
         }
 
-        public virtual async Task Delete(long entityId)
+        public virtual async Task DeleteAsync(long entityId)
         {
             var entity = _unitOfWork.Repository<TEntity>().Find(entityId);
+            if (entity == null)
+            {
+                throw new NotFoundException();
+            }
             _unitOfWork.Repository<TEntity>().Delete(entity);
             await _unitOfWork.CommitAsync();
         }
 
-        public virtual async Task Update(TEntity entity)
+        public virtual async Task UpdateAsync(TEntity entity)
         {
             _unitOfWork.Repository<TEntity>().Update(entity);
             await _unitOfWork.CommitAsync();
         }
 
-        public virtual TEntity Get(int entityId)
+        public virtual TEntity Get(long entityId)
         {
             return _unitOfWork.Repository<TEntity>().Find(entityId);
         }
