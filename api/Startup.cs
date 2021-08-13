@@ -1,21 +1,18 @@
 using System;
 using System.Text;
 using api.Extensions;
-using api.Models;
-using api.Services;
-using api.Services.PasswordHashers;
-using api.Services.TokenGenerators;
-using api.Services.TokenValidators;
-using Infrastucture;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Service.PasswordHashers;
+using Service.TokenGenerators;
+using Service.TokenValidators;
 
 namespace api
 {
@@ -31,7 +28,6 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.AddDatabase(Configuration);
             services.AddServices();
             services.AddAutoMapper(typeof(ApiMappingProfile));

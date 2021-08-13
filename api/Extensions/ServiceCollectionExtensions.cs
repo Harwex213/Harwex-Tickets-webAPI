@@ -4,7 +4,7 @@ using Infrastucture;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Service;
+using Service.Services;
 
 namespace api.Extensions
 {

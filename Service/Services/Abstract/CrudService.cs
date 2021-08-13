@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Service.Exceptions;
 
-namespace Service
+namespace Service.Services.Abstract
 {
     public abstract class CrudService<TEntity> : ICrudService<TEntity> where TEntity : class
     {

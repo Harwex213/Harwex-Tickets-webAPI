@@ -1,4 +1,6 @@
-﻿namespace api.Services.PasswordHashers
+﻿using Domain.Interfaces;
+
+namespace Service.PasswordHashers
 {
     public class BcryptPasswordHasher : IPasswordHasher
     {

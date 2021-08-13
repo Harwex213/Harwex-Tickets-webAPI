@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces.Services;
 
-namespace Service
+namespace Service.Services
 {
     public class AuthService : IAuthService
     {
