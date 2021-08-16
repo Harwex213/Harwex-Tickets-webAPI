@@ -25,10 +25,21 @@ namespace api.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(AuthRegisterRequest registerRequest)
+        public async Task<IActionResult> Register(AuthRegisterRequest registerRequest)
         {
-            _authService.Register(_authMapper.Map<User>(registerRequest));
-            return Ok();
+            try
+            {
+                if (registerRequest.Password != registerRequest.ConfirmPassword)
+                    return BadRequest("Passwords must match");
+            
+                await _authService.Register(_authMapper.Map<User>(registerRequest));
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                if (e is UnauthorizedException) return Conflict(e.Message);
+                return BadRequest();
+            }
         }
 
         [HttpPost("login")]

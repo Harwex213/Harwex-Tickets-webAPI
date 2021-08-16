@@ -18,16 +18,29 @@ namespace Service.Services
         private readonly IUnitOfWork _unitOfWork;
 
         public AuthService(ITokensGenerator tokensGenerator, IRefreshTokenValidator refreshTokenValidator,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
         {
             _tokensGenerator = tokensGenerator;
             _refreshTokenValidator = refreshTokenValidator;
             _unitOfWork = unitOfWork;
+            _passwordHasher = passwordHasher;
         }
 
-        public void Register(User user)
+        public async Task Register(User user)
         {
-            throw new NotImplementedException();
+            var isUserExist =
+                _unitOfWork.Repository<User>().List(u => u.Username == user.Username).FirstOrDefault();
+            if (isUserExist != null) throw new ConflictException("Username already exists.");
+
+            var isPhoneNumberExist =
+                _unitOfWork.Repository<User>().List(u => u.PhoneNumber == user.PhoneNumber).FirstOrDefault();
+            if (isPhoneNumberExist != null) throw new ConflictException("Phone Number already taken.");
+
+            user.PasswordHash = _passwordHasher.HashPassword(user.PasswordHash);
+            user.RoleName = "user";
+            _unitOfWork.Repository<User>().Add(user);
+            
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task<(string accessToken, string refreshToken)> LogIn(string username, string password)
@@ -51,7 +64,8 @@ namespace Service.Services
             throw new NotImplementedException();
         }
 
-        private async Task<(string accessToken, string refreshToken)> GenerateTokens(User user, RefreshToken refreshToken = null)
+        private async Task<(string accessToken, string refreshToken)> GenerateTokens(User user,
+            RefreshToken refreshToken = null)
         {
             var claims = new List<Claim>
             {
@@ -64,11 +78,8 @@ namespace Service.Services
             var refreshTokenString = _tokensGenerator.GenerateRefreshToken();
             refreshToken ??= _unitOfWork.Repository<RefreshToken>().List(t => t.UserId == user.Id).FirstOrDefault();
 
-            if (refreshToken != null)
-            {
-                _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
-            }
-            
+            if (refreshToken != null) _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
+
             _unitOfWork.Repository<RefreshToken>().Add(new RefreshToken
             {
                 Id = default,
@@ -78,7 +89,7 @@ namespace Service.Services
             });
 
             await _unitOfWork.CommitAsync();
-            
+
             return (accessTokenString, refreshTokenString);
         }
     }
