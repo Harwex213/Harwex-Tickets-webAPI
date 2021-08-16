@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace Service.Services
             user.PasswordHash = _passwordHasher.HashPassword(user.PasswordHash);
             user.RoleName = "user";
             _unitOfWork.Repository<User>().Add(user);
-            
+
             await _unitOfWork.CommitAsync();
         }
 
@@ -51,46 +50,77 @@ namespace Service.Services
             var isCorrectPassword = _passwordHasher.VerifyPassword(password, user.PasswordHash);
             if (!isCorrectPassword) throw new UnauthorizedException();
 
-            return await GenerateTokens(user);
+            var (accessTokenString, refreshTokenString) = GenerateTokens(user);
+            await UpdateRefreshToken(new RefreshToken
+            {
+                UserId = user.Id,
+                Token = refreshTokenString
+            });
+
+            return (accessTokenString, refreshTokenString);
         }
 
-        public void LogOut(long userId)
+        public async Task LogOut(long userId)
         {
-            throw new NotImplementedException();
+            var refreshToken = _unitOfWork.Repository<RefreshToken>().Find(userId);
+            if (refreshToken == null) throw new UnauthorizedException();
+
+            _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
+            await _unitOfWork.CommitAsync();
         }
 
-        public async Task<(string accessToken, string refreshToken)> Refresh(string refreshToken)
+        public async Task<(string accessToken, string refreshToken)> Refresh(string oldRefreshTokenString)
         {
-            throw new NotImplementedException();
+            var isValidRefreshToken = _refreshTokenValidator.Validate(oldRefreshTokenString);
+            if (!isValidRefreshToken) throw new UnauthorizedException();
+
+            var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.Token == oldRefreshTokenString)
+                .FirstOrDefault();
+            if (refreshToken == null) throw new UnauthorizedException();
+
+            var user = _unitOfWork.Repository<User>().Find(refreshToken.UserId);
+            if (user == null) throw new NotFoundException("User doesn't exist");
+
+            var (newAccessTokenString, newRefreshTokenString) = GenerateTokens(user);
+            await UpdateRefreshToken(new RefreshToken
+            {
+                UserId = user.Id,
+                Token = newRefreshTokenString
+            }, refreshToken);
+
+            return (newAccessTokenString, newRefreshTokenString);
         }
 
-        private async Task<(string accessToken, string refreshToken)> GenerateTokens(User user,
-            RefreshToken refreshToken = null)
+        private (string accessToken, string refreshToken) GenerateTokens(User user)
         {
             var claims = new List<Claim>
             {
                 new("id", user.Id.ToString()),
-                new(ClaimsIdentity.DefaultNameClaimType, user.Username),
-                new(ClaimsIdentity.DefaultRoleClaimType, user.RoleName)
+                new("Name", user.Username),
+                new("Role", user.RoleName)
             };
 
             var accessTokenString = _tokensGenerator.GenerateAccessToken(claims);
             var refreshTokenString = _tokensGenerator.GenerateRefreshToken();
-            refreshToken ??= _unitOfWork.Repository<RefreshToken>().List(t => t.UserId == user.Id).FirstOrDefault();
 
-            if (refreshToken != null) _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
+            return (accessTokenString, refreshTokenString);
+        }
+
+        private async Task UpdateRefreshToken(RefreshToken newRefreshToken, RefreshToken oldRefreshToken = null)
+        {
+            oldRefreshToken ??= _unitOfWork.Repository<RefreshToken>().List(r => r.UserId == newRefreshToken.UserId)
+                .FirstOrDefault();
+            if (oldRefreshToken != null) _unitOfWork.Repository<RefreshToken>().Delete(oldRefreshToken);
 
             _unitOfWork.Repository<RefreshToken>().Add(new RefreshToken
             {
                 Id = default,
-                Token = refreshTokenString,
-                UserId = user.Id,
+                Token = newRefreshToken.Token,
+                UserId = newRefreshToken.UserId,
                 IsDeleted = false
             });
 
             await _unitOfWork.CommitAsync();
-
-            return (accessTokenString, refreshTokenString);
         }
     }
 }

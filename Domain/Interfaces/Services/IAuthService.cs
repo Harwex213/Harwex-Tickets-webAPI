@@ -7,7 +7,7 @@ namespace Domain.Interfaces.Services
     {
         Task Register(User user);
         Task<(string accessToken, string refreshToken)> LogIn(string username, string password);
-        void LogOut(long userId);
-        Task<(string accessToken, string refreshToken)> Refresh(string refreshToken);
+        Task LogOut(long userId);
+        Task<(string accessToken, string refreshToken)> Refresh(string oldRefreshTokenString);
     }
 }

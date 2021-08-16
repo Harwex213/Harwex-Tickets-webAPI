@@ -66,21 +66,37 @@ namespace api.Controllers
         [HttpPost("logout")]
         public IActionResult LogOut()
         {
-            var userId = HttpContext.User.FindFirstValue("id");
-            if (userId == null) return NotFound();
-            _authService.LogOut(long.Parse(userId));
-            return Ok();
+            try
+            {
+                var userId = HttpContext.User.FindFirstValue("id");
+                if (userId == null) return NotFound();
+                _authService.LogOut(long.Parse(userId));
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                if (e is UnauthorizedException) return Unauthorized();
+                return BadRequest();
+            }
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(AuthRefreshRequest refreshRequest)
         {
-            var (accessToken, refreshToken) = await _authService.Refresh(refreshRequest.RefreshToken);
-            return Ok(new AuthAuthenticatedResponse
+            try
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            });
+                var (accessToken, refreshToken) = await _authService.Refresh(refreshRequest.RefreshToken);
+                return Ok(new AuthAuthenticatedResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                });
+            }
+            catch (Exception e)
+            {
+                if (e is NotFoundException) return Unauthorized();
+                throw;
+            }
         }
     }
 }
