@@ -30,15 +30,15 @@ namespace api.Controllers
             try
             {
                 if (registerRequest.Password != registerRequest.ConfirmPassword)
-                    return BadRequest("Passwords must match");
+                    return BadRequest(new ErrorResponse("Passwords must match"));
             
                 await _authService.Register(_authMapper.Map<User>(registerRequest));
-                return Ok();
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                if (e is ConflictException) return Conflict(e.Message);
-                return BadRequest();
+                if (e is ConflictException) return Conflict(new ErrorResponse(e.Message));
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -57,8 +57,8 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is UnauthorizedException) return Unauthorized();
-                return BadRequest();
+                if (e is UnauthorizedException) return Unauthorized(new ErrorResponse(e.Message));
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -71,12 +71,12 @@ namespace api.Controllers
                 var userId = HttpContext.User.FindFirstValue("id");
                 if (userId == null) return NotFound();
                 await _authService.LogOut(long.Parse(userId));
-                return Ok();
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                if (e is UnauthorizedException) return Unauthorized();
-                return BadRequest();
+                if (e is UnauthorizedException) return Unauthorized(new ErrorResponse(e.Message));
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -94,8 +94,8 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is NotFoundException) return Unauthorized();
-                return BadRequest();
+                if (e is NotFoundException) return Unauthorized(new ErrorResponse(e.Message));
+                return BadRequest(new ErrorResponse());
             }
         }
     }
