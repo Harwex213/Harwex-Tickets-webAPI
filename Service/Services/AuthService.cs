@@ -45,10 +45,10 @@ namespace Service.Services
         public async Task<(string accessToken, string refreshToken)> LogIn(string username, string password)
         {
             var user = _unitOfWork.Repository<User>().List(u => u.Username == username).FirstOrDefault();
-            if (user == null) throw new UnauthorizedException();
+            if (user == null) throw new UnauthorizedException("Username or password is wrong.");
 
             var isCorrectPassword = _passwordHasher.VerifyPassword(password, user.PasswordHash);
-            if (!isCorrectPassword) throw new UnauthorizedException();
+            if (!isCorrectPassword) throw new UnauthorizedException("Username or password is wrong.");
 
             var (accessTokenString, refreshTokenString) = GenerateTokens(user);
             await UpdateRefreshToken(new RefreshToken
@@ -63,7 +63,7 @@ namespace Service.Services
         public async Task LogOut(long userId)
         {
             var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.UserId == userId).FirstOrDefault();
-            if (refreshToken == null) throw new UnauthorizedException();
+            if (refreshToken == null) throw new UnauthorizedException("User doesn't exist.");
 
             _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
             await _unitOfWork.CommitAsync();
@@ -72,11 +72,11 @@ namespace Service.Services
         public async Task<(string accessToken, string refreshToken)> Refresh(string oldRefreshTokenString)
         {
             var isValidRefreshToken = _refreshTokenValidator.Validate(oldRefreshTokenString);
-            if (!isValidRefreshToken) throw new UnauthorizedException();
+            if (!isValidRefreshToken) throw new UnauthorizedException("Unauthorized.");
 
             var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.Token == oldRefreshTokenString)
                 .FirstOrDefault();
-            if (refreshToken == null) throw new UnauthorizedException();
+            if (refreshToken == null) throw new UnauthorizedException("Unauthorized.");
 
             var user = _unitOfWork.Repository<User>().Find(refreshToken.UserId);
             if (user == null) throw new NotFoundException("User doesn't exist");
