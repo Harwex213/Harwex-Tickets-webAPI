@@ -37,7 +37,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is UnauthorizedException) return Conflict(e.Message);
+                if (e is ConflictException) return Conflict(e.Message);
                 return BadRequest();
             }
         }
@@ -64,13 +64,13 @@ namespace api.Controllers
 
         [Authorize]
         [HttpPost("logout")]
-        public IActionResult LogOut()
+        public async Task<IActionResult> LogOut()
         {
             try
             {
                 var userId = HttpContext.User.FindFirstValue("id");
                 if (userId == null) return NotFound();
-                _authService.LogOut(long.Parse(userId));
+                await _authService.LogOut(long.Parse(userId));
                 return Ok();
             }
             catch (Exception e)
@@ -95,7 +95,7 @@ namespace api.Controllers
             catch (Exception e)
             {
                 if (e is NotFoundException) return Unauthorized();
-                throw;
+                return BadRequest();
             }
         }
     }

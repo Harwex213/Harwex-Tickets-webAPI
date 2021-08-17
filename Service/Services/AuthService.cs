@@ -62,7 +62,7 @@ namespace Service.Services
 
         public async Task LogOut(long userId)
         {
-            var refreshToken = _unitOfWork.Repository<RefreshToken>().Find(userId);
+            var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.UserId == userId).FirstOrDefault();
             if (refreshToken == null) throw new UnauthorizedException();
 
             _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
