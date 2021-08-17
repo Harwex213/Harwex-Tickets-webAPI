@@ -69,7 +69,7 @@ namespace api.Controllers
             try
             {
                 var userId = HttpContext.User.FindFirstValue("id");
-                if (userId == null) return NotFound();
+                if (userId == null) return NotFound(new ErrorResponse("User with that id doesn't found"));
                 await _authService.LogOut(long.Parse(userId));
                 return Ok(new SuccessResponse());
             }
