@@ -34,7 +34,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -50,7 +50,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -68,7 +68,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -81,11 +81,11 @@ namespace api.Controllers
                 if (id != cinemaUpdateRequest.Id) return BadRequest();
                 var cinema = _cinemasMapper.Map<Cinema>(cinemaUpdateRequest);
                 await _cinemasService.UpdateAsync(cinema);
-                return NoContent();
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(new ErrorResponse());
             }
         }
 
@@ -96,12 +96,12 @@ namespace api.Controllers
             try
             {
                 await _cinemasService.DeleteAsync(id);
-                return Ok();
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
                 if (e is NotFoundException) return NotFound();
-                return BadRequest();
+                return BadRequest(new ErrorResponse());
             }
         }
     }
