@@ -9,6 +9,7 @@ namespace api
         public ApiMappingProfile()
         {
             CinemaMapping();
+            CityMapping();
             AuthMapping();
         }
 
@@ -18,6 +19,11 @@ namespace api
             CreateMap<CinemaUpdateRequest, Cinema>();
             CreateMap<Cinema, CinemaGetResponse>();
             CreateMap<Cinema, CinemaCreateResponse>();
+        }
+
+        private void CityMapping()
+        {
+            CreateMap<City, CityGetResponse>();
         }
 
         private void AuthMapping()

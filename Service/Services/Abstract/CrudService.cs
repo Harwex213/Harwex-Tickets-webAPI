@@ -8,44 +8,44 @@ namespace Service.Services.Abstract
 {
     public abstract class CrudService<TEntity> : ICrudService<TEntity> where TEntity : class
     {
-        private readonly IUnitOfWork _unitOfWork;
+        protected IUnitOfWork UnitOfWork { get; }
 
         protected CrudService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork;
         }
 
         public virtual async Task AddAsync(TEntity entity)
         {
-            _unitOfWork.Repository<TEntity>().Add(entity);
-            await _unitOfWork.CommitAsync();
+            UnitOfWork.Repository<TEntity>().Add(entity);
+            await UnitOfWork.CommitAsync();
         }
 
         public virtual async Task DeleteAsync(long entityId)
         {
-            var entity = _unitOfWork.Repository<TEntity>().Find(entityId);
+            var entity = UnitOfWork.Repository<TEntity>().Find(entityId);
             if (entity == null)
             {
                 throw new NotFoundException();
             }
-            _unitOfWork.Repository<TEntity>().Delete(entity);
-            await _unitOfWork.CommitAsync();
+            UnitOfWork.Repository<TEntity>().Delete(entity);
+            await UnitOfWork.CommitAsync();
         }
 
         public virtual async Task UpdateAsync(TEntity entity)
         {
-            _unitOfWork.Repository<TEntity>().Update(entity);
-            await _unitOfWork.CommitAsync();
+            UnitOfWork.Repository<TEntity>().Update(entity);
+            await UnitOfWork.CommitAsync();
         }
 
         public virtual TEntity Get(long entityId)
         {
-            return _unitOfWork.Repository<TEntity>().Find(entityId);
+            return UnitOfWork.Repository<TEntity>().Find(entityId);
         }
 
         public virtual IList<TEntity> GetAll()
         {
-            return _unitOfWork.Repository<TEntity>().GetAll();
+            return UnitOfWork.Repository<TEntity>().GetAll();
         }
     }
 }
