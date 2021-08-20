@@ -21,13 +21,13 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCorsPolicies();
-            
+
             services.AddControllers();
 
             services.AddDatabase(Configuration);
             services.AddJwtTokenAuthentication(Configuration);
             services.AddServices();
-            services.AddAutoMapper(typeof(ApiMappingProfile));
+            services.AddAutoMapperProfiles();
 
             services.AddSwaggerGen(c =>
             {
@@ -47,7 +47,7 @@ namespace api
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            
+
             app.UseCors();
 
             app.UseAuthentication();

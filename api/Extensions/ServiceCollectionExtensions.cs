@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Service.JwtTokens;
+using Service.MappingProfiles;
 using Service.PasswordHashers;
 using Service.Services;
 
@@ -17,7 +18,7 @@ namespace api.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
             {
@@ -25,19 +26,17 @@ namespace api.Extensions
             });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            return services;
         }
-        
-        public static IServiceCollection AddJwtTokenAuthentication(this IServiceCollection services, IConfiguration configuration)
+
+        public static void AddJwtTokenAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<ITokensGenerator, JwtTokensGenerator>();
             services.AddSingleton<IRefreshTokenValidator, JwtRefreshTokenValidator>();
             services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-            
+
             var authenticationConfiguration = new AuthenticationConfiguration();
             configuration.Bind("Authentication", authenticationConfiguration);
-            
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -57,20 +56,16 @@ namespace api.Extensions
                         ClockSkew = TimeSpan.Zero
                     };
                 });
-
-            return services;
         }
 
-        public static IServiceCollection AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICinemasService, CinemaService>();
             services.AddScoped<ICitiesService, CityService>();
             services.AddScoped<IAuthService, AuthService>();
-
-            return services;
         }
-        
-        public static IServiceCollection AddCorsPolicies(this IServiceCollection services)
+
+        public static void AddCorsPolicies(this IServiceCollection services)
         {
             services.AddCors(options =>
             {
@@ -82,8 +77,11 @@ namespace api.Extensions
                             .AllowAnyMethod();
                     });
             });
+        }
 
-            return services;
+        public static void AddAutoMapperProfiles(this IServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(ApiMappingProfile), typeof(CinemaProfile));
         }
     }
 }
