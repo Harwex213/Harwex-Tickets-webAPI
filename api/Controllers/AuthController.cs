@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using api.ViewModel;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Exceptions;
+using Service.Services;
 
 namespace api.Controllers
 {
@@ -30,14 +30,20 @@ namespace api.Controllers
             try
             {
                 if (registerRequest.Password != registerRequest.ConfirmPassword)
+                {
                     return BadRequest(new ErrorResponse("Passwords must match"));
-            
+                }
+
                 await _authService.Register(_authMapper.Map<User>(registerRequest));
                 return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                if (e is ConflictException) return Conflict(new ErrorResponse(e.Message));
+                if (e is ConflictException)
+                {
+                    return Conflict(new ErrorResponse(e.Message));
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }
@@ -57,7 +63,11 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is UnauthorizedException) return Unauthorized(new ErrorResponse(e.Message));
+                if (e is UnauthorizedException)
+                {
+                    return Unauthorized(new ErrorResponse(e.Message));
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }
@@ -69,13 +79,21 @@ namespace api.Controllers
             try
             {
                 var userId = HttpContext.User.FindFirstValue("id");
-                if (userId == null) return NotFound(new ErrorResponse("User with that id doesn't found"));
+                if (userId == null)
+                {
+                    return NotFound(new ErrorResponse("User with that id doesn't found"));
+                }
+
                 await _authService.LogOut(long.Parse(userId));
                 return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                if (e is UnauthorizedException) return Unauthorized(new ErrorResponse(e.Message));
+                if (e is UnauthorizedException)
+                {
+                    return Unauthorized(new ErrorResponse(e.Message));
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }
@@ -94,7 +112,11 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is NotFoundException) return Unauthorized(new ErrorResponse(e.Message));
+                if (e is NotFoundException)
+                {
+                    return Unauthorized(new ErrorResponse(e.Message));
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }

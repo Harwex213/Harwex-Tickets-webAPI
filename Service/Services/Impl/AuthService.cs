@@ -4,10 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
-using Domain.Interfaces.Services;
 using Service.Exceptions;
 
-namespace Service.Services
+namespace Service.Services.Impl
 {
     public class AuthService : IAuthService
     {
@@ -29,11 +28,17 @@ namespace Service.Services
         {
             var isUserExist =
                 _unitOfWork.Repository<User>().List(u => u.Username == user.Username).FirstOrDefault();
-            if (isUserExist != null) throw new ConflictException("Username already exists.");
+            if (isUserExist != null)
+            {
+                throw new ConflictException("Username already exists.");
+            }
 
             var isPhoneNumberExist =
                 _unitOfWork.Repository<User>().List(u => u.PhoneNumber == user.PhoneNumber).FirstOrDefault();
-            if (isPhoneNumberExist != null) throw new ConflictException("Phone Number already taken.");
+            if (isPhoneNumberExist != null)
+            {
+                throw new ConflictException("Phone Number already taken.");
+            }
 
             user.PasswordHash = _passwordHasher.HashPassword(user.PasswordHash);
             user.RoleName = "user";
@@ -45,10 +50,16 @@ namespace Service.Services
         public async Task<(string accessToken, string refreshToken)> LogIn(string username, string password)
         {
             var user = _unitOfWork.Repository<User>().List(u => u.Username == username).FirstOrDefault();
-            if (user == null) throw new UnauthorizedException("Username or password is wrong.");
+            if (user == null)
+            {
+                throw new UnauthorizedException("Username or password is wrong.");
+            }
 
             var isCorrectPassword = _passwordHasher.VerifyPassword(password, user.PasswordHash);
-            if (!isCorrectPassword) throw new UnauthorizedException("Username or password is wrong.");
+            if (!isCorrectPassword)
+            {
+                throw new UnauthorizedException("Username or password is wrong.");
+            }
 
             var (accessTokenString, refreshTokenString) = GenerateTokens(user);
             await UpdateRefreshToken(new RefreshToken
@@ -63,7 +74,10 @@ namespace Service.Services
         public async Task LogOut(long userId)
         {
             var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.UserId == userId).FirstOrDefault();
-            if (refreshToken == null) throw new UnauthorizedException("User doesn't exist.");
+            if (refreshToken == null)
+            {
+                throw new UnauthorizedException("User doesn't exist.");
+            }
 
             _unitOfWork.Repository<RefreshToken>().Delete(refreshToken);
             await _unitOfWork.CommitAsync();
@@ -72,14 +86,23 @@ namespace Service.Services
         public async Task<(string accessToken, string refreshToken)> Refresh(string oldRefreshTokenString)
         {
             var isValidRefreshToken = _refreshTokenValidator.Validate(oldRefreshTokenString);
-            if (!isValidRefreshToken) throw new UnauthorizedException("Unauthorized.");
+            if (!isValidRefreshToken)
+            {
+                throw new UnauthorizedException("Unauthorized.");
+            }
 
             var refreshToken = _unitOfWork.Repository<RefreshToken>().List(u => u.Token == oldRefreshTokenString)
                 .FirstOrDefault();
-            if (refreshToken == null) throw new UnauthorizedException("Unauthorized.");
+            if (refreshToken == null)
+            {
+                throw new UnauthorizedException("Unauthorized.");
+            }
 
             var user = _unitOfWork.Repository<User>().Find(refreshToken.UserId);
-            if (user == null) throw new NotFoundException("User doesn't exist");
+            if (user == null)
+            {
+                throw new NotFoundException("User doesn't exist");
+            }
 
             var (newAccessTokenString, newRefreshTokenString) = GenerateTokens(user);
             await UpdateRefreshToken(new RefreshToken
@@ -110,7 +133,10 @@ namespace Service.Services
         {
             oldRefreshToken ??= _unitOfWork.Repository<RefreshToken>().List(r => r.UserId == newRefreshToken.UserId)
                 .FirstOrDefault();
-            if (oldRefreshToken != null) _unitOfWork.Repository<RefreshToken>().Delete(oldRefreshToken);
+            if (oldRefreshToken != null)
+            {
+                _unitOfWork.Repository<RefreshToken>().Delete(oldRefreshToken);
+            }
 
             _unitOfWork.Repository<RefreshToken>().Add(new RefreshToken
             {

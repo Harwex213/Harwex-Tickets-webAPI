@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.ViewModel;
-using AutoMapper;
-using Domain.Entities;
-using Domain.Interfaces.Services;
-using Domain.Models.Cinema;
 using Microsoft.AspNetCore.Mvc;
 using Service.Exceptions;
+using Service.Models.Cinema;
+using Service.Services;
 
 namespace api.Controllers
 {
@@ -15,23 +13,20 @@ namespace api.Controllers
     [ApiController]
     public class CinemasController : ControllerBase
     {
-        private readonly IMapper _cinemasMapper;
         private readonly ICinemasService _cinemasService;
 
-        public CinemasController(ICinemasService cinemasService, IMapper cinemasMapper)
+        public CinemasController(ICinemasService cinemasService)
         {
             _cinemasService = cinemasService;
-            _cinemasMapper = cinemasMapper;
         }
 
         // GET: api/Cinemas
         [HttpGet]
-        public IActionResult GetCinemas()
+        public ActionResult<IEnumerable<CinemaResponseModel>> GetCinemas()
         {
             try
             {
-                var cinemas = _cinemasService.GetAll();
-                return Ok(cinemas.Select(cinema => _cinemasMapper.Map<CinemaGetResponse>(cinema)));
+                return Ok(_cinemasService.GetAll());
             }
             catch (Exception e)
             {
@@ -41,16 +36,25 @@ namespace api.Controllers
 
         // GET: api/Cinemas/5
         [HttpGet("{id:long}")]
-        public IActionResult GetCinema(long id)
+        public ActionResult<CinemaResponseModel> GetCinema(long id)
         {
             try
             {
-                var cinema = _cinemasService.Get(id);
-                if (cinema == null) return NotFound();
-                return Ok(_cinemasMapper.Map<CinemaGetResponse>(cinema));
+                var cinemaResponseModel = _cinemasService.Get(id);
+                if (cinemaResponseModel == null)
+                {
+                    return NotFound(new ErrorResponse("Not Found"));
+                }
+
+                return Ok(cinemaResponseModel);
             }
             catch (Exception e)
             {
+                if (e is NotFoundException)
+                {
+                    return NotFound(e.Message);
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }
@@ -76,13 +80,17 @@ namespace api.Controllers
         // PUT: api/Cinemas/5
         // [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
-        public async Task<IActionResult> PutCinema(long id, [FromBody] CinemaUpdateRequest cinemaUpdateRequest)
+        public async Task<ActionResult<SuccessResponse>> PutCinema(long id,
+            [FromBody] UpdateCinemaModel updateCinemaModel)
         {
             try
             {
-                if (id != cinemaUpdateRequest.Id) return BadRequest();
-                var cinema = _cinemasMapper.Map<Cinema>(cinemaUpdateRequest);
-                await _cinemasService.UpdateAsync(cinema);
+                if (id != updateCinemaModel.Id)
+                {
+                    return BadRequest(new ErrorResponse("Id must match"));
+                }
+
+                await _cinemasService.UpdateAsync(updateCinemaModel);
                 return Ok(new SuccessResponse());
             }
             catch (Exception e)
@@ -93,8 +101,8 @@ namespace api.Controllers
 
         // DELETE: api/Cinemas/5
         // [Authorize(Roles = "admin")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCinema(int id)
+        [HttpDelete("{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> DeleteCinema(long id)
         {
             try
             {
@@ -103,7 +111,11 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is NotFoundException) return NotFound();
+                if (e is NotFoundException)
+                {
+                    return NotFound(e.Message);
+                }
+
                 return BadRequest(new ErrorResponse());
             }
         }

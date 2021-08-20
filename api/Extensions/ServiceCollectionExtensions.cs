@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using Domain.Interfaces;
-using Domain.Interfaces.Services;
 using Domain.Models;
 using Infrastucture;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +12,7 @@ using Service.JwtTokens;
 using Service.MappingProfiles;
 using Service.PasswordHashers;
 using Service.Services;
+using Service.Services.Impl;
 
 namespace api.Extensions
 {
@@ -61,7 +61,6 @@ namespace api.Extensions
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICinemasService, CinemaService>();
-            services.AddScoped<ICitiesService, CityService>();
             services.AddScoped<IAuthService, AuthService>();
         }
 

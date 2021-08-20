@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Domain.Entities;
 
-namespace Domain.Interfaces.Services
+namespace Service.Services
 {
     public interface IAuthService
     {
