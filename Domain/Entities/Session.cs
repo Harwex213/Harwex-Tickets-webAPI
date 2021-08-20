@@ -8,15 +8,15 @@ namespace Domain.Entities
     {
         public Session()
         {
-            SessionServices = new HashSet<SessionService>();
             SessionSeatPrices = new HashSet<SessionSeatPrice>();
         }
         
         public long HallId { get; set; }
+        public long MovieId { get; set; }
         public DateTime Time { get; set; }
         
         public virtual Hall Hall { get; set; }
+        public virtual Movie Movie { get; set; }
         public virtual ICollection<SessionSeatPrice> SessionSeatPrices { get; set; }
-        public virtual ICollection<SessionService> SessionServices { get; set; }
     }
 }

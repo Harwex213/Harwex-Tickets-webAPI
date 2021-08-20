@@ -4,14 +4,16 @@ using Infrastucture;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210820100512_removeCinemaMovies")]
+    partial class removeCinemaMovies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,11 +174,35 @@ namespace Infrastucture.Migrations
                     b.Property<int>("Row")
                         .HasColumnType("int");
 
+                    b.Property<string>("SeatTypeName")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HallId");
 
+                    b.HasIndex("SeatTypeName");
+
                     b.ToTable("Seats");
+                });
+
+            modelBuilder.Entity("Domain.Entities.SeatType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeatTypes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Session", b =>
@@ -220,10 +246,15 @@ namespace Infrastucture.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
 
+                    b.Property<string>("SeatTypeName")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<long>("SessionId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SeatTypeName");
 
                     b.HasIndex("SessionId");
 
@@ -244,6 +275,9 @@ namespace Infrastucture.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long>("SessionSeatPriceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SessionServiceId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
@@ -319,7 +353,14 @@ namespace Infrastucture.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.SeatType", "SeatType")
+                        .WithMany("Seats")
+                        .HasForeignKey("SeatTypeName")
+                        .HasPrincipalKey("Name");
+
                     b.Navigation("Hall");
+
+                    b.Navigation("SeatType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Session", b =>
@@ -343,11 +384,18 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entities.SessionSeatPrice", b =>
                 {
+                    b.HasOne("Domain.Entities.SeatType", "SeatType")
+                        .WithMany("SessionSeatPrices")
+                        .HasForeignKey("SeatTypeName")
+                        .HasPrincipalKey("Name");
+
                     b.HasOne("Domain.Entities.Session", "Session")
                         .WithMany("SessionSeatPrices")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("SeatType");
 
                     b.Navigation("Session");
                 });
@@ -419,6 +467,13 @@ namespace Infrastucture.Migrations
             modelBuilder.Entity("Domain.Entities.Seat", b =>
                 {
                     b.Navigation("Tickets");
+                });
+
+            modelBuilder.Entity("Domain.Entities.SeatType", b =>
+                {
+                    b.Navigation("Seats");
+
+                    b.Navigation("SessionSeatPrices");
                 });
 
             modelBuilder.Entity("Domain.Entities.Session", b =>
