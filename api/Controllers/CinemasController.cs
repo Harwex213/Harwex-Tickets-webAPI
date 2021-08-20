@@ -5,7 +5,7 @@ using api.ViewModel;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces.Services;
-using Microsoft.AspNetCore.Authorization;
+using Domain.Models.Cinema;
 using Microsoft.AspNetCore.Mvc;
 using Service.Exceptions;
 
@@ -56,17 +56,16 @@ namespace api.Controllers
         }
 
         // POST: api/Cinemas
-        [Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<IActionResult> PostCinema([FromBody] CinemaCreateRequest cinemaCreateRequest)
+        public async Task<ActionResult<CreateCinemaResponseModel>> PostCinema(
+            [FromBody] CreateCinemaModel createCinemaModel)
         {
             try
             {
-                var cinema = _cinemasMapper.Map<Cinema>(cinemaCreateRequest);
-                await _cinemasService.AddAsync(cinema);
-                var response = CreatedAtAction(nameof(GetCinema), new {id = cinema.Id},
-                    _cinemasMapper.Map<CinemaCreateResponse>(cinema));
-                return response;
+                var cinemaResponseModel = await _cinemasService.AddAsync(createCinemaModel);
+                return CreatedAtAction(nameof(GetCinema), new {id = cinemaResponseModel.Id},
+                    cinemaResponseModel);
             }
             catch (Exception e)
             {
@@ -75,7 +74,7 @@ namespace api.Controllers
         }
 
         // PUT: api/Cinemas/5
-        [Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
         public async Task<IActionResult> PutCinema(long id, [FromBody] CinemaUpdateRequest cinemaUpdateRequest)
         {
@@ -93,7 +92,7 @@ namespace api.Controllers
         }
 
         // DELETE: api/Cinemas/5
-        [Authorize(Roles = "admin")]
+        // [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCinema(int id)
         {
