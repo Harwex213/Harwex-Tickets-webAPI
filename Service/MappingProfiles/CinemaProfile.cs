@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities;
-using Domain.Models.Cinema;
+using Service.Models.Cinema;
 
 namespace Service.MappingProfiles
 {
@@ -11,6 +11,10 @@ namespace Service.MappingProfiles
             CreateMap<CreateCinemaModel, Cinema>()
                 .ForMember(c => c.Halls, opt => opt.Ignore());
             CreateMap<Cinema, CreateCinemaResponseModel>();
+            
+            CreateMap<UpdateCinemaModel, Cinema>();
+            
+            CreateMap<Cinema, CinemaResponseModel>();
         }
     }
 }

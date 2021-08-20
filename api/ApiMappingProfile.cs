@@ -8,13 +8,7 @@ namespace api
     {
         public ApiMappingProfile()
         {
-            CityMapping();
             AuthMapping();
-        }
-
-        private void CityMapping()
-        {
-            CreateMap<City, CityGetResponse>();
         }
 
         private void AuthMapping()
