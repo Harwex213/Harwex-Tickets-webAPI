@@ -1,16 +1,12 @@
 ﻿using System.Collections.Generic;
-using Domain.Models.Hall;
+using Service.Models.Hall;
 
-namespace Domain.Models.Cinema
+namespace Service.Models.Cinema
 {
-    public class CreateCinemaModel
+    public class CinemaResponseModel : BaseResponseModel, ICinemaGeneratableModel
     {
         public string Name { get; set; }
         public long CityId { get; set; }
         public ICollection<HallModel> Halls { get; set; }
-    }
-
-    public class CreateCinemaResponseModel : BaseResponseModel
-    {
     }
 }

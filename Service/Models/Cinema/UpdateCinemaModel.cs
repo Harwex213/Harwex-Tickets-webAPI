@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Domain.Models.Hall;
+using Service.Models.Hall;
 
-namespace Domain.Models.Cinema
+namespace Service.Models.Cinema
 {
-    public class UpdateCinemaModel
+    public class UpdateCinemaModel : ICinemaGeneratableModel
     {
         public long Id { get; set; }
         public string Name { get; set; }

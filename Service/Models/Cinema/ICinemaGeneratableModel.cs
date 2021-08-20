@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Domain.Models.Hall;
+using Service.Models.Hall;
 
-namespace Domain.Models.Cinema
+namespace Service.Models.Cinema
 {
-    public class CinemaResponseModel : BaseResponseModel
+    public interface ICinemaGeneratableModel
     {
         public string Name { get; set; }
         public long CityId { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Hall
+﻿namespace Service.Models.Hall
 {
     public class HallModel
     {
