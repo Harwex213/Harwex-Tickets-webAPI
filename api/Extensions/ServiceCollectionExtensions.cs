@@ -63,7 +63,7 @@ namespace api.Extensions
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ICinemasService, CinemaService>();
+            services.AddScoped<ICinemasService, CinemasService>();
             services.AddScoped<ICitiesService, CitiesService>();
             services.AddScoped<IMoviesService, MoviesService>();
         }

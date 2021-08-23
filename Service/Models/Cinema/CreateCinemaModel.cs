@@ -12,5 +12,6 @@ namespace Service.Models.Cinema
 
     public class CreateCinemaResponseModel : BaseResponseModel
     {
+        public ICollection<CreateHallResponseModel> Halls { get; set; }
     }
 }

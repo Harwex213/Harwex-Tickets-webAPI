@@ -6,11 +6,10 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Service.Exceptions;
 using Service.Models.Cinema;
-using Service.Models.Hall;
 
 namespace Service.Services.Impl
 {
-    public class CinemaService : ICinemasService
+    public class CinemasService : ICinemasService
     {
         private readonly IRepository<Cinema> _cinemaRepository;
         private readonly IRepository<Hall> _hallRepository;
@@ -18,7 +17,7 @@ namespace Service.Services.Impl
         private readonly IRepository<Seat> _seatRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CinemaService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CinemasService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _cinemaRepository = unitOfWork.Repository<Cinema>();
@@ -32,14 +31,14 @@ namespace Service.Services.Impl
             var cinemaEntity = _cinemaRepository.Find(entityId);
             ExceptionChecker.CheckEntityOnNull(cinemaEntity);
             
-            return GenerateCinemaResponseModel(cinemaEntity);
+            return _mapper.Map<CinemaResponseModel>(cinemaEntity);
         }
 
         public IEnumerable<CinemaResponseModel> GetAll()
         {
             var cinemas = _cinemaRepository.GetAll();
             
-            return cinemas.Select(GenerateCinemaResponseModel).ToList();
+            return cinemas.Select(_mapper.Map<CinemaResponseModel>).ToList();
         }
 
         public async Task<CreateCinemaResponseModel> AddAsync(CreateCinemaModel createCinemaModel)
@@ -78,25 +77,6 @@ namespace Service.Services.Impl
 
             _cinemaRepository.Update(cinemaEntity);
             await _unitOfWork.CommitAsync();
-        }
-
-        private CinemaResponseModel GenerateCinemaResponseModel(Cinema cinemaEntity)
-        {
-            var cinemaModel = _mapper.Map<CinemaResponseModel>(cinemaEntity);
-            cinemaModel.Halls = new List<HallModel>();
-
-            foreach (var hall in cinemaEntity.Halls)
-            {
-                var hallModel = new HallModel
-                {
-                    RowsAmount = hall.RowsAmount,
-                    ColsAmount = hall.ColsAmount
-                };
-
-                cinemaModel.Halls.Add(hallModel);
-            }
-
-            return cinemaModel;
         }
 
         private void AddHalls(IGeneratableCinemaModel cinemaModel, Cinema cinemaEntity, bool addToRepository = false)

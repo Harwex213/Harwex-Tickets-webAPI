@@ -14,9 +14,8 @@ namespace Service.MappingProfiles
             
             CreateMap<UpdateCinemaModel, Cinema>()
                 .ForMember(c => c.Halls, opt => opt.Ignore());
-            
-            CreateMap<Cinema, CinemaResponseModel>()
-                .ForMember(c => c.Halls, opt => opt.Ignore());
+
+            CreateMap<Cinema, CinemaResponseModel>();
         }
     }
 }
