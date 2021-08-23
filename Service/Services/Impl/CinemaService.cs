@@ -30,7 +30,7 @@ namespace Service.Services.Impl
         public CinemaResponseModel Get(long entityId)
         {
             var cinemaEntity = _cinemaRepository.Find(entityId);
-            CheckCinemaEntityOnNull(cinemaEntity);
+            ExceptionChecker.CheckEntityOnNull(cinemaEntity);
             
             return GenerateCinemaResponseModel(cinemaEntity);
         }
@@ -57,7 +57,7 @@ namespace Service.Services.Impl
         public async Task DeleteAsync(long entityId)
         {
             var cinemaEntity = _cinemaRepository.Find(entityId);
-            CheckCinemaEntityOnNull(cinemaEntity);
+            ExceptionChecker.CheckEntityOnNull(cinemaEntity);
             
             DeleteCinema(cinemaEntity);
             
@@ -67,7 +67,7 @@ namespace Service.Services.Impl
         public async Task UpdateAsync(UpdateCinemaModel updateCinemaModel)
         {
             var cinemaEntity = _cinemaRepository.Find(updateCinemaModel.Id);
-            CheckCinemaEntityOnNull(cinemaEntity);
+            ExceptionChecker.CheckEntityOnNull(cinemaEntity);
 
             cinemaEntity.CityId = updateCinemaModel.CityId;
             cinemaEntity.Name = updateCinemaModel.Name;
@@ -78,14 +78,6 @@ namespace Service.Services.Impl
 
             _cinemaRepository.Update(cinemaEntity);
             await _unitOfWork.CommitAsync();
-        }
-
-        private void CheckCinemaEntityOnNull(Cinema cinemaEntity)
-        {
-            if (cinemaEntity == null)
-            {
-                throw new NotFoundException();
-            }
         }
 
         private CinemaResponseModel GenerateCinemaResponseModel(Cinema cinemaEntity)

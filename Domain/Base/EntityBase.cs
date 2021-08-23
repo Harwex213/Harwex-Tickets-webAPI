@@ -2,10 +2,15 @@
 
 namespace Domain.Base
 {
-    public abstract class EntityBase<TKey>
+    public interface IEntityBase
+    {
+    }
+
+    public abstract class EntityBase<TKey> : IEntityBase
     {
         [Key]
         public virtual TKey Id { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }
