@@ -3,7 +3,7 @@ using Service.Models.Hall;
 
 namespace Service.Models.Cinema
 {
-    public class CinemaResponseModel : BaseResponseModel, ICinemaGeneratableModel
+    public class CinemaResponseModel : BaseResponseModel
     {
         public string Name { get; set; }
         public long CityId { get; set; }

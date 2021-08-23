@@ -22,7 +22,9 @@ namespace api.Extensions
         {
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options
+                    .UseLazyLoadingProxies()
+                    .UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -80,7 +82,9 @@ namespace api.Extensions
 
         public static void AddAutoMapperProfiles(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(ApiMappingProfile), typeof(CinemaProfile));
+            services.AddAutoMapper(typeof(ApiMappingProfile),
+                typeof(CinemaProfile),
+                typeof(MapProfile));
         }
     }
 }

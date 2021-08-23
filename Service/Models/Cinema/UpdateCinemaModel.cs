@@ -3,7 +3,7 @@ using Service.Models.Hall;
 
 namespace Service.Models.Cinema
 {
-    public class UpdateCinemaModel : ICinemaGeneratableModel
+    public class UpdateCinemaModel : IGeneratableCinemaModel
     {
         public long Id { get; set; }
         public string Name { get; set; }
