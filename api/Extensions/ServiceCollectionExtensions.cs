@@ -63,6 +63,7 @@ namespace api.Extensions
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICinemasService, CinemaService>();
+            services.AddScoped<ICitiesService, CitiesService>();
             services.AddScoped<IAuthService, AuthService>();
         }
 
@@ -84,7 +85,8 @@ namespace api.Extensions
         {
             services.AddAutoMapper(typeof(ApiMappingProfile),
                 typeof(CinemaProfile),
-                typeof(MapProfile));
+                typeof(HallProfile),
+                typeof(CityProfile));
         }
     }
 }

@@ -7,7 +7,7 @@ namespace api.Controllers.Abstract
 {
     public abstract class ExceptionHandlerController : ControllerBase
     {
-        public ActionResult AnalyzeException(Exception exception)
+        protected ActionResult AnalyzeException(Exception exception)
         {
             return exception switch
             {
