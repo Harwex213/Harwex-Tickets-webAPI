@@ -19,7 +19,6 @@ namespace Infrastucture
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Seat> Seats { get; set; }
         public DbSet<Session> Sessions { get; set; }
-        public DbSet<SessionSeatPrice> SessionSeatPrices { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
@@ -35,7 +34,7 @@ namespace Infrastucture
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>(UserConfigure);
-            modelBuilder.Entity<SessionSeatPrice>(SessionSeatPriceConfigure);
+            modelBuilder.Entity<Session>(SessionConfigure);
         }
         
         private void UserConfigure(EntityTypeBuilder<User> builder)
@@ -46,7 +45,7 @@ namespace Infrastucture
                 .HasPrincipalKey(t => t.Name);
         }
 
-        private void SessionSeatPriceConfigure(EntityTypeBuilder<SessionSeatPrice> builder)
+        private void SessionConfigure(EntityTypeBuilder<Session> builder)
         {
             builder.Property(e => e.Price).HasColumnType("money");
         }
