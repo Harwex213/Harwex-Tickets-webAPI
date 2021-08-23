@@ -66,6 +66,7 @@ namespace api.Extensions
             services.AddScoped<ICinemasService, CinemasService>();
             services.AddScoped<ICitiesService, CitiesService>();
             services.AddScoped<IMoviesService, MoviesService>();
+            services.AddScoped<ISessionsService, SessionsService>();
         }
 
         public static void AddCorsPolicies(this IServiceCollection services)
@@ -88,7 +89,8 @@ namespace api.Extensions
                 typeof(CinemaProfile),
                 typeof(HallProfile),
                 typeof(CityProfile),
-                typeof(MovieProfile));
+                typeof(MovieProfile),
+                typeof(SessionProfile));
         }
     }
 }
