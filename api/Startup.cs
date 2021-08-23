@@ -22,7 +22,7 @@ namespace api
         {
             services.AddCorsPolicies();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddDatabase(Configuration);
             services.AddJwtTokenAuthentication(Configuration);

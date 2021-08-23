@@ -62,9 +62,10 @@ namespace api.Extensions
 
         public static void AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICinemasService, CinemaService>();
             services.AddScoped<ICitiesService, CitiesService>();
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IMoviesService, MoviesService>();
         }
 
         public static void AddCorsPolicies(this IServiceCollection services)
@@ -86,7 +87,8 @@ namespace api.Extensions
             services.AddAutoMapper(typeof(ApiMappingProfile),
                 typeof(CinemaProfile),
                 typeof(HallProfile),
-                typeof(CityProfile));
+                typeof(CityProfile),
+                typeof(MovieProfile));
         }
     }
 }
