@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using api.Controllers.Abstract;
 using api.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Service.Exceptions;
 using Service.Models.Cinema;
 using Service.Services;
 
@@ -11,7 +11,7 @@ namespace api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CinemasController : ControllerBase
+    public class CinemasController : ExceptionHandlerController
     {
         private readonly ICinemasService _cinemasService;
 
@@ -30,7 +30,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new ErrorResponse());
+                return AnalyzeException(e);
             }
         }
 
@@ -50,12 +50,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is NotFoundException)
-                {
-                    return NotFound(e.Message);
-                }
-
-                return BadRequest(new ErrorResponse());
+                return AnalyzeException(e);
             }
         }
 
@@ -73,7 +68,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new ErrorResponse());
+                return AnalyzeException(e);
             }
         }
 
@@ -95,7 +90,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new ErrorResponse());
+                return AnalyzeException(e);
             }
         }
 
@@ -111,12 +106,7 @@ namespace api.Controllers
             }
             catch (Exception e)
             {
-                if (e is NotFoundException)
-                {
-                    return NotFound(e.Message);
-                }
-
-                return BadRequest(new ErrorResponse());
+                return AnalyzeException(e);
             }
         }
     }
