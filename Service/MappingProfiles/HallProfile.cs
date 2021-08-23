@@ -4,9 +4,9 @@ using Service.Models.Hall;
 
 namespace Service.MappingProfiles
 {
-    public class MapProfile : Profile
+    public class HallProfile : Profile
     {
-        public MapProfile()
+        public HallProfile()
         {
             CreateMap<Hall, HallModel>();
         }
