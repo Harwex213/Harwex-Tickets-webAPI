@@ -67,6 +67,7 @@ namespace api.Extensions
             services.AddScoped<ICitiesService, CitiesService>();
             services.AddScoped<IMoviesService, MoviesService>();
             services.AddScoped<ISessionsService, SessionsService>();
+            services.AddScoped<ITicketsService, TicketsService>();
         }
 
         public static void AddCorsPolicies(this IServiceCollection services)
@@ -91,7 +92,8 @@ namespace api.Extensions
                 typeof(CityProfile),
                 typeof(MovieProfile),
                 typeof(SessionProfile),
-                typeof(SeatProfile));
+                typeof(SeatProfile),
+                typeof(TicketProfile));
         }
     }
 }
