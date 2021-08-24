@@ -12,8 +12,8 @@ namespace Service.Services.Impl
     public class TicketsService : ITicketsService
     {
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Ticket> _ticketRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public TicketsService(IMapper mapper, IUnitOfWork unitOfWork)
         {
@@ -25,10 +25,14 @@ namespace Service.Services.Impl
         public async Task<CreateTicketResponseModel> AddAsync(CreateTicketModel createTicketModel)
         {
             var ticketEntity = _mapper.Map<Ticket>(createTicketModel);
-            
+            if (CheckTicketOnOrdered(ticketEntity))
+            {
+                throw new ConflictException("Ticket was ordered");
+            }
+
             _ticketRepository.Add(ticketEntity);
             await _unitOfWork.CommitAsync();
-            
+
             return _mapper.Map<CreateTicketResponseModel>(ticketEntity);
         }
 
@@ -36,7 +40,7 @@ namespace Service.Services.Impl
         {
             var ticketEntity = _ticketRepository.Find(entityId);
             ExceptionChecker.CheckEntityOnNull(ticketEntity);
-            
+
             _ticketRepository.Delete(ticketEntity);
             await _unitOfWork.CommitAsync();
         }
@@ -44,7 +48,11 @@ namespace Service.Services.Impl
         public async Task UpdateAsync(UpdateTicketModel updateTicketModel)
         {
             var ticketEntity = _mapper.Map<Ticket>(updateTicketModel);
-            
+            if (CheckTicketOnOrdered(ticketEntity))
+            {
+                throw new ConflictException("Ticket was ordered");
+            }
+
             _ticketRepository.Update(ticketEntity);
             await _unitOfWork.CommitAsync();
         }
@@ -60,8 +68,16 @@ namespace Service.Services.Impl
         public IEnumerable<TicketResponseModel> GetAll()
         {
             var ticketEntities = _ticketRepository.GetAll();
-            
+
             return ticketEntities.Select(ticketEntity => _mapper.Map<TicketResponseModel>(ticketEntity)).ToList();
+        }
+
+        private bool CheckTicketOnOrdered(Ticket ticketEntity)
+        {
+            var orderedTicket = _ticketRepository.List(ticket =>
+                ticket.UserId == ticketEntity.UserId && ticket.SessionId == ticketEntity.SessionId &&
+                ticket.SeatId == ticketEntity.SeatId).FirstOrDefault();
+            return orderedTicket != null;
         }
     }
 }
