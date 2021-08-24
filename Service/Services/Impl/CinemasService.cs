@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -51,7 +50,11 @@ namespace Service.Services.Impl
         {
             var cinemaEntity = _mapper.Map<Cinema>(createCinemaModel);
 
-            AddHalls(createCinemaModel, cinemaEntity);
+            foreach (var hallModel in createCinemaModel.Halls)
+            {
+                var hallEntity = GenerateHallEntity(hallModel);
+                cinemaEntity.Halls.Add(hallEntity);
+            }
 
             _cinemaRepository.Add(cinemaEntity);
             await _unitOfWork.CommitAsync();
@@ -73,64 +76,65 @@ namespace Service.Services.Impl
         {
             var hallEntity = _hallRepository.Find(hallId);
             ExceptionChecker.CheckEntityOnNull(hallEntity);
-            
+
             DeleteHall(hallEntity);
-            
+
             await _unitOfWork.CommitAsync();
         }
 
         public async Task UpdateAsync(UpdateCinemaModel updateCinemaModel)
         {
             var cinemaEntity = _mapper.Map<Cinema>(updateCinemaModel);
-            
+
             _cinemaRepository.Update(cinemaEntity);
-            
+
             await _unitOfWork.CommitAsync();
         }
 
         public async Task UpdateHallAsync(UpdateHallModel updateHallModel)
         {
-            var hallEntity = _mapper.Map<Hall>(updateHallModel);
+            var hallEntity = _hallRepository.Find(updateHallModel.Id);
+            ExceptionChecker.CheckEntityOnNull(hallEntity);
+
+            DeleteSeats(hallEntity);
+            foreach (var sessionEntity in hallEntity.Sessions)
+            {
+                DeleteTickets(sessionEntity);
+            }
             
+            var newHallEntity = GenerateHallEntity(_mapper.Map<HallModel>(updateHallModel));
+            hallEntity.ColsAmount = newHallEntity.ColsAmount;
+            hallEntity.RowsAmount = newHallEntity.RowsAmount;
+            hallEntity.Seats = newHallEntity.Seats;
+
             _hallRepository.Update(hallEntity);
-            
+
             await _unitOfWork.CommitAsync();
         }
 
-        private void AddHalls(CreateCinemaModel cinemaModel, Cinema cinemaEntity, bool addToRepository = false)
+        private Hall GenerateHallEntity(HallModel hallModel)
         {
-            foreach (var hallModel in cinemaModel.Halls)
+            var hallEntity = new Hall
             {
-                var hallEntity = new Hall
-                {
-                    ColsAmount = hallModel.ColsAmount,
-                    RowsAmount = hallModel.RowsAmount
-                };
+                ColsAmount = hallModel.ColsAmount,
+                RowsAmount = hallModel.RowsAmount
+            };
 
-                for (var i = 0; i < hallModel.RowsAmount; i++)
+            for (var i = 0; i < hallModel.RowsAmount; i++)
+            {
+                for (var j = 0; j < hallModel.ColsAmount; j++)
                 {
-                    for (var j = 0; j < hallModel.ColsAmount; j++)
+                    var seatEntity = new Seat
                     {
-                        var seatEntity = new Seat
-                        {
-                            Row = i,
-                            Position = j
-                        };
+                        Row = i,
+                        Position = j
+                    };
 
-                        hallEntity.Seats.Add(seatEntity);
-                        if (addToRepository)
-                        {
-                            _seatRepository.Add(seatEntity);
-                        }
-                    }
-                }
-
-                cinemaEntity.Halls.Add(hallEntity);
-                if (addToRepository)
-                {
-                    _hallRepository.Add(hallEntity);
+                    hallEntity.Seats.Add(seatEntity);
                 }
             }
+
+            return hallEntity;
         }
 
         private void DeleteCinema(Cinema cinemaEntity)
@@ -139,6 +143,7 @@ namespace Service.Services.Impl
             {
                 DeleteHall(hallEntity);
             }
+
             _cinemaRepository.Delete(cinemaEntity);
         }
 

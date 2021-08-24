@@ -11,6 +11,7 @@ namespace Service.MappingProfiles
             CreateMap<Hall, HallModel>();
             
             CreateMap<UpdateHallModel, Hall>();
+            CreateMap<UpdateHallModel, HallModel>();
             
             CreateMap<Hall, CreateHallResponseModel>();
         }
