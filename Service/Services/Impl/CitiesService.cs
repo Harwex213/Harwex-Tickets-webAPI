@@ -63,5 +63,13 @@ namespace Service.Services.Impl
             
             return cityEntities.Select(cityEntity => _mapper.Map<CityResponseModel>(cityEntity)).ToList();
         }
+        
+        
+        public IEnumerable<CityResponseModel> GetAllByName(string name)
+        {
+            var cityEntities = _cityRepository.List(city => city.Name == name);
+            
+            return cityEntities.Select(cityEntity => _mapper.Map<CityResponseModel>(cityEntity)).ToList();
+        }
     }
 }

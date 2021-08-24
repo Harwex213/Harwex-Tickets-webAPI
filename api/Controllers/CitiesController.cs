@@ -22,10 +22,14 @@ namespace api.Controllers
 
         // GET: api/Cities
         [HttpGet]
-        public ActionResult<IEnumerable<CityResponseModel>> GetCities()
+        public ActionResult<IEnumerable<CityResponseModel>> GetCities(string cityName)
         {
             try
             {
+                if (cityName != null)
+                {
+                    return Ok(_citiesService.GetAllByName(cityName));
+                }
                 return Ok(_citiesService.GetAll());
             }
             catch (Exception e)

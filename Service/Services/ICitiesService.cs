@@ -12,5 +12,6 @@ namespace Service.Services
         public Task UpdateAsync(UpdateCityModel updateCityModel);
         public CityResponseModel Get(long entityId);
         public IEnumerable<CityResponseModel> GetAll();
+        public IEnumerable<CityResponseModel> GetAllByName(string name);
     }
 }
