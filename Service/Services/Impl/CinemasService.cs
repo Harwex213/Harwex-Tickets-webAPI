@@ -50,12 +50,6 @@ namespace Service.Services.Impl
         {
             var cinemaEntity = _mapper.Map<Cinema>(createCinemaModel);
 
-            foreach (var hallModel in createCinemaModel.Halls)
-            {
-                var hallEntity = GenerateHallEntity(hallModel);
-                cinemaEntity.Halls.Add(hallEntity);
-            }
-
             _cinemaRepository.Add(cinemaEntity);
             await _unitOfWork.CommitAsync();
 

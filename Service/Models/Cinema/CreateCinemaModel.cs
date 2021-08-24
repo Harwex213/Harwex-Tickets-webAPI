@@ -7,11 +7,9 @@ namespace Service.Models.Cinema
     {
         public string Name { get; set; }
         public long CityId { get; set; }
-        public ICollection<HallModel> Halls { get; set; }
     }
 
     public class CreateCinemaResponseModel : BaseResponseModel
     {
-        public ICollection<CreateHallResponseModel> Halls { get; set; }
     }
 }
