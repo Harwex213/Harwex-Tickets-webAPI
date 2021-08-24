@@ -8,6 +8,7 @@ namespace Service.Services
     public interface ICinemasService
     {
         public Task<CreateCinemaResponseModel> AddAsync(CreateCinemaModel createCinemaModel);
+        public Task<CreateHallResponseModel> AddHallAsync(CreateHallModel createHallModel);
         public Task DeleteAsync(long entityId);
         public Task DeleteHallAsync(long hallId);
         public Task UpdateAsync(UpdateCinemaModel updateCinemaModel);

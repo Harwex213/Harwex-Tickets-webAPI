@@ -62,6 +62,18 @@ namespace Service.Services.Impl
             return _mapper.Map<CreateCinemaResponseModel>(cinemaEntity);
         }
 
+        public async Task<CreateHallResponseModel> AddHallAsync(CreateHallModel createHallModel)
+        {
+            var hallEntity = _mapper.Map<Hall>(createHallModel);
+
+            hallEntity.Seats = GenerateHallEntity(_mapper.Map<HallModel>(createHallModel)).Seats;
+
+            _hallRepository.Add(hallEntity);
+            await _unitOfWork.CommitAsync();
+
+            return _mapper.Map<CreateHallResponseModel>(hallEntity);
+        }
+
         public async Task DeleteAsync(long entityId)
         {
             var cinemaEntity = _cinemaRepository.Find(entityId);
