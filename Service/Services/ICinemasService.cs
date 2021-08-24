@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Service.Models.Cinema;
+using Service.Models.Hall;
 
 namespace Service.Services
 {
@@ -8,7 +9,9 @@ namespace Service.Services
     {
         public Task<CreateCinemaResponseModel> AddAsync(CreateCinemaModel createCinemaModel);
         public Task DeleteAsync(long entityId);
+        public Task DeleteHallAsync(long hallId);
         public Task UpdateAsync(UpdateCinemaModel updateCinemaModel);
+        public Task UpdateHallAsync(UpdateHallModel updateHallModel);
         public CinemaResponseModel Get(long entityId);
         public IEnumerable<CinemaResponseModel> GetAll();
     }

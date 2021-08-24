@@ -9,6 +9,9 @@ namespace Service.MappingProfiles
         public HallProfile()
         {
             CreateMap<Hall, HallModel>();
+            
+            CreateMap<UpdateHallModel, Hall>();
+            
             CreateMap<Hall, CreateHallResponseModel>();
         }
     }
