@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using api.Controllers.Abstract;
 using api.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Service.Models.Seat;
 using Service.Models.Session;
 using Service.Services;
 
@@ -47,6 +48,20 @@ namespace api.Controllers
                 }
 
                 return Ok(sessionResponseModel);
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
+            }
+        }
+        
+        // GET: api/Sessions/5/Seats
+        [HttpGet("{id:long}/seats")]
+        public ActionResult<IEnumerable<SeatResponseModel>> GetSessionFreeSeats(long id)
+        {
+            try
+            {
+                return Ok(_sessionsService.GetFreeSeats(id));
             }
             catch (Exception e)
             {
