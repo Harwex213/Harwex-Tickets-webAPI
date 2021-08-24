@@ -90,7 +90,8 @@ namespace api.Extensions
                 typeof(HallProfile),
                 typeof(CityProfile),
                 typeof(MovieProfile),
-                typeof(SessionProfile));
+                typeof(SessionProfile),
+                typeof(SeatProfile));
         }
     }
 }

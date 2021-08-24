@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Service.Models.Seat;
 using Service.Models.Session;
 
 namespace Service.Services
@@ -11,5 +12,6 @@ namespace Service.Services
         public Task UpdateAsync(UpdateSessionModel updateSessionModel);
         public SessionResponseModel Get(long entityId);
         public IEnumerable<SessionResponseModel> GetAll();
+        public IEnumerable<SeatResponseModel>  GetFreeSeats(long entityId);
     }
 }

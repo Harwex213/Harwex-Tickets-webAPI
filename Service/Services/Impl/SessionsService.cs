@@ -5,6 +5,7 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using Service.Exceptions;
+using Service.Models.Seat;
 using Service.Models.Session;
 
 namespace Service.Services.Impl
@@ -61,7 +62,18 @@ namespace Service.Services.Impl
         {
             var sessionEntities = _sessionRepository.GetAll();
             
-            return sessionEntities.Select(SessionEntity => _mapper.Map<SessionResponseModel>(SessionEntity)).ToList();
+            return sessionEntities.Select(sessionEntity => _mapper.Map<SessionResponseModel>(sessionEntity)).ToList();
+        }
+
+        public IEnumerable<SeatResponseModel> GetFreeSeats(long entityId)
+        {
+            var sessionEntity = _sessionRepository.Find(entityId);
+            ExceptionChecker.CheckEntityOnNull(sessionEntity);
+
+            var orderedSeats = sessionEntity.Tickets.Select(ticket => ticket.Seat);
+            var freeSeats = sessionEntity.Hall.Seats.Except(orderedSeats);
+
+            return freeSeats.Select(seatEntity => _mapper.Map<SeatResponseModel>(seatEntity)).ToList();
         }
     }
 }
