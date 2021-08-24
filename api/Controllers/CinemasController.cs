@@ -5,6 +5,7 @@ using api.Controllers.Abstract;
 using api.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models.Cinema;
+using Service.Models.Hall;
 using Service.Services;
 
 namespace api.Controllers
@@ -71,6 +72,24 @@ namespace api.Controllers
                 return AnalyzeException(e);
             }
         }
+        
+        // POST: api/Cinemas/halls
+        // [Authorize(Roles = "admin")]
+        [HttpPost("halls")]
+        public async Task<ActionResult<CreateHallResponseModel>> PostCinema(
+            [FromBody] CreateHallModel createHallModel)
+        {
+            try
+            {
+                var hallResponseModel = await _cinemasService.AddHallAsync(createHallModel);
+                return CreatedAtAction(nameof(GetCinema), new {id = hallResponseModel.Id},
+                    hallResponseModel);
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
+            }
+        }
 
         // PUT: api/Cinemas/5
         // [Authorize(Roles = "admin")]
@@ -93,6 +112,28 @@ namespace api.Controllers
                 return AnalyzeException(e);
             }
         }
+        
+        // PUT: api/Cinemas/halls/5
+        // [Authorize(Roles = "admin")]
+        [HttpPut("halls/{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> PutHall(long id,
+            [FromBody] UpdateHallModel updateHallModel)
+        {
+            try
+            {
+                if (id != updateHallModel.Id)
+                {
+                    return BadRequest(new ErrorResponse("Id must match"));
+                }
+
+                await _cinemasService.UpdateHallAsync(updateHallModel);
+                return Ok(new SuccessResponse());
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
+            }
+        }
 
         // DELETE: api/Cinemas/5
         // [Authorize(Roles = "admin")]
@@ -102,6 +143,22 @@ namespace api.Controllers
             try
             {
                 await _cinemasService.DeleteAsync(id);
+                return Ok(new SuccessResponse());
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
+            }
+        }
+        
+        // DELETE: api/Cinemas/halls/5
+        // [Authorize(Roles = "admin")]
+        [HttpDelete("halls/{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> DeleteHall(long id)
+        {
+            try
+            {
+                await _cinemasService.DeleteHallAsync(id);
                 return Ok(new SuccessResponse());
             }
             catch (Exception e)
