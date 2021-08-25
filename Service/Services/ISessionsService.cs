@@ -11,7 +11,7 @@ namespace Service.Services
         public Task DeleteAsync(long entityId);
         public Task UpdateAsync(UpdateSessionModel updateSessionModel);
         public SessionResponseModel Get(long entityId);
-        public IEnumerable<SessionResponseModel> GetAll();
+        public IEnumerable<SessionResponseModel> GetAll(long? cinemaId, long? movieId);
         public IEnumerable<SeatResponseModel>  GetFreeSeats(long entityId);
     }
 }

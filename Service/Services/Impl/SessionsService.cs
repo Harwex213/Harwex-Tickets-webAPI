@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Entities;
@@ -13,8 +15,8 @@ namespace Service.Services.Impl
     public class SessionsService : ISessionsService
     {
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Session> _sessionRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public SessionsService(IMapper mapper, IUnitOfWork unitOfWork)
         {
@@ -26,10 +28,10 @@ namespace Service.Services.Impl
         public async Task<CreateSessionResponseModel> AddAsync(CreateSessionModel createSessionModel)
         {
             var sessionEntity = _mapper.Map<Session>(createSessionModel);
-            
+
             _sessionRepository.Add(sessionEntity);
             await _unitOfWork.CommitAsync();
-            
+
             return _mapper.Map<CreateSessionResponseModel>(sessionEntity);
         }
 
@@ -37,7 +39,7 @@ namespace Service.Services.Impl
         {
             var sessionEntity = _sessionRepository.Find(entityId);
             ExceptionChecker.CheckEntityOnNull(sessionEntity);
-            
+
             _sessionRepository.Delete(sessionEntity);
             await _unitOfWork.CommitAsync();
         }
@@ -45,7 +47,7 @@ namespace Service.Services.Impl
         public async Task UpdateAsync(UpdateSessionModel updateSessionModel)
         {
             var sessionEntity = _mapper.Map<Session>(updateSessionModel);
-            
+
             _sessionRepository.Update(sessionEntity);
             await _unitOfWork.CommitAsync();
         }
@@ -58,12 +60,6 @@ namespace Service.Services.Impl
             return _mapper.Map<SessionResponseModel>(sessionEntity);
         }
 
-        public IEnumerable<SessionResponseModel> GetAll()
-        {
-            var sessionEntities = _sessionRepository.GetAll();
-            
-            return sessionEntities.Select(sessionEntity => _mapper.Map<SessionResponseModel>(sessionEntity)).ToList();
-        }
 
         public IEnumerable<SeatResponseModel> GetFreeSeats(long entityId)
         {
@@ -74,6 +70,30 @@ namespace Service.Services.Impl
             var freeSeats = sessionEntity.Hall.Seats.Except(orderedSeats);
 
             return freeSeats.Select(seatEntity => _mapper.Map<SeatResponseModel>(seatEntity)).ToList();
+        }
+
+        public IEnumerable<SessionResponseModel> GetAll(long? cinemaId, long? movieId)
+        {
+            Expression<Func<Session, bool>> expression = null;
+            if (movieId != null)
+            {
+                expression = session => session.MovieId == movieId;
+            }
+
+            if (cinemaId != null)
+            {
+                expression = session => session.Hall.CinemaId == cinemaId;
+            }
+
+            if (cinemaId != null && movieId != null)
+            {
+                expression = session => session.Hall.CinemaId == cinemaId && session.MovieId == movieId;
+            }
+
+            IEnumerable<Session> sessionEntities =
+                expression != null ? _sessionRepository.List(expression) : _sessionRepository.GetAll();
+
+            return sessionEntities.Select(sessionEntity => _mapper.Map<SessionResponseModel>(sessionEntity)).ToList();
         }
     }
 }

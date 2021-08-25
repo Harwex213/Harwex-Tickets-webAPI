@@ -23,18 +23,18 @@ namespace api.Controllers
 
         // GET: api/Sessions
         [HttpGet]
-        public ActionResult<IEnumerable<SessionResponseModel>> GetSessions()
+        public ActionResult<IEnumerable<SessionResponseModel>> GetSessions(long? cinemaId, long? movieId)
         {
             try
             {
-                return Ok(_sessionsService.GetAll());
+                return Ok(_sessionsService.GetAll(cinemaId, movieId));
             }
             catch (Exception e)
             {
                 return AnalyzeException(e);
             }
         }
-
+        
         // GET: api/Sessions/5
         [HttpGet("{id:long}")]
         public ActionResult<SessionResponseModel> GetSession(long id)
