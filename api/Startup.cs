@@ -1,3 +1,4 @@
+using System.Linq;
 using api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ namespace api
 
             services.AddSwaggerGen(c =>
             {
+                c.ResolveConflictingActions(d => d.First());
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "HarwexTicketsAPI", Version = "v1"});
             });
         }

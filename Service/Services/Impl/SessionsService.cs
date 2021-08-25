@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Entities;
@@ -74,24 +72,18 @@ namespace Service.Services.Impl
 
         public IEnumerable<SessionResponseModel> GetAll(long? cinemaId, long? movieId)
         {
-            Expression<Func<Session, bool>> expression = null;
+            IQueryable<Session> filteredSessionEntities = null;
             if (movieId != null)
             {
-                expression = session => session.MovieId == movieId;
+                filteredSessionEntities = _sessionRepository.List(session => session.MovieId == movieId);
             }
 
             if (cinemaId != null)
             {
-                expression = session => session.Hall.CinemaId == cinemaId;
+                filteredSessionEntities = _sessionRepository.List(session => session.Hall.CinemaId == cinemaId);
             }
 
-            if (cinemaId != null && movieId != null)
-            {
-                expression = session => session.Hall.CinemaId == cinemaId && session.MovieId == movieId;
-            }
-
-            IEnumerable<Session> sessionEntities =
-                expression != null ? _sessionRepository.List(expression) : _sessionRepository.GetAll();
+            var sessionEntities = (IEnumerable<Session>) filteredSessionEntities ?? _sessionRepository.GetAll();
 
             return sessionEntities.Select(sessionEntity => _mapper.Map<SessionResponseModel>(sessionEntity)).ToList();
         }
