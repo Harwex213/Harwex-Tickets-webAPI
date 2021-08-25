@@ -75,7 +75,7 @@ namespace Service.Services.Impl
         private bool CheckTicketOnOrdered(Ticket ticketEntity)
         {
             var orderedTicket = _ticketRepository.List(ticket =>
-                ticket.UserId == ticketEntity.UserId && ticket.SessionId == ticketEntity.SessionId &&
+                ticket.SessionId == ticketEntity.SessionId &&
                 ticket.SeatId == ticketEntity.SeatId).FirstOrDefault();
             return orderedTicket != null;
         }
