@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Controllers.Abstract;
 using api.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models.Seat;
 using Service.Models.Session;
@@ -70,7 +71,7 @@ namespace api.Controllers
         }
 
         // POST: api/Sessions
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<CreateSessionResponseModel>> PostSession(
             [FromBody] CreateSessionModel createSessionModel)
@@ -88,7 +89,7 @@ namespace api.Controllers
         }
 
         // PUT: api/Sessions/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> PutSession(long id,
             [FromBody] UpdateSessionModel updateSessionModel)
@@ -110,7 +111,7 @@ namespace api.Controllers
         }
 
         // DELETE: api/Sessions/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> DeleteSession(long id)
         {

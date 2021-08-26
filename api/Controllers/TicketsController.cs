@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Controllers.Abstract;
 using api.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Services;
 using Service.Models.Ticket;
@@ -55,7 +56,7 @@ namespace api.Controllers
         }
 
         // POST: api/Tickets
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "user, admin")]
         [HttpPost]
         public async Task<ActionResult<CreateTicketResponseModel>> PostTicket(
             [FromBody] CreateTicketModel createTicketModel)
@@ -73,7 +74,7 @@ namespace api.Controllers
         }
 
         // PUT: api/Tickets/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "user, admin")]
         [HttpPut("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> PutTicket(long id,
             [FromBody] UpdateTicketModel updateTicketModel)
@@ -95,7 +96,7 @@ namespace api.Controllers
         }
 
         // DELETE: api/Tickets/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "user, admin")]
         [HttpDelete("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> DeleteTicket(long id)
         {

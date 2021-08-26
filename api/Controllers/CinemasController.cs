@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Controllers.Abstract;
 using api.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models.Cinema;
 using Service.Models.Hall;
@@ -56,7 +57,7 @@ namespace api.Controllers
         }
 
         // POST: api/Cinemas
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<CreateCinemaResponseModel>> PostCinema(
             [FromBody] CreateCinemaModel createCinemaModel)
@@ -74,9 +75,9 @@ namespace api.Controllers
         }
         
         // POST: api/Cinemas/halls
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("halls")]
-        public async Task<ActionResult<CreateHallResponseModel>> PostCinema(
+        public async Task<ActionResult<CreateHallResponseModel>> PostHall(
             [FromBody] CreateHallModel createHallModel)
         {
             try
@@ -92,7 +93,7 @@ namespace api.Controllers
         }
 
         // PUT: api/Cinemas/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> PutCinema(long id,
             [FromBody] UpdateCinemaModel updateCinemaModel)
@@ -114,7 +115,7 @@ namespace api.Controllers
         }
         
         // PUT: api/Cinemas/halls/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("halls/{id:long}")]
         public async Task<ActionResult<SuccessResponse>> PutHall(long id,
             [FromBody] UpdateHallModel updateHallModel)
@@ -136,7 +137,7 @@ namespace api.Controllers
         }
 
         // DELETE: api/Cinemas/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> DeleteCinema(long id)
         {
@@ -152,7 +153,7 @@ namespace api.Controllers
         }
         
         // DELETE: api/Cinemas/halls/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("halls/{id:long}")]
         public async Task<ActionResult<SuccessResponse>> DeleteHall(long id)
         {

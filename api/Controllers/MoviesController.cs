@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Controllers.Abstract;
 using api.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Models.Movie;
 using Service.Services;
@@ -55,7 +56,7 @@ namespace api.Controllers
         }
 
         // POST: api/Movies
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<CreateMovieResponseModel>> PostMovie(
             [FromBody] CreateMovieModel createMovieModel)
@@ -73,7 +74,7 @@ namespace api.Controllers
         }
 
         // PUT: api/Movies/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> PutMovie(long id,
             [FromBody] UpdateMovieModel updateMovieModel)
@@ -95,7 +96,7 @@ namespace api.Controllers
         }
 
         // DELETE: api/Movies/5
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:long}")]
         public async Task<ActionResult<SuccessResponse>> DeleteMovie(long id)
         {
