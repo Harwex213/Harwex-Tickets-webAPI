@@ -120,7 +120,9 @@ namespace Service.Services.Impl
             {
                 new("id", user.Id.ToString()),
                 new("Name", user.Username),
-                new("Role", user.RoleName)
+                new("Role", user.RoleName),
+                new(ClaimsIdentity.DefaultNameClaimType, user.Username),
+                new(ClaimsIdentity.DefaultRoleClaimType, user.RoleName),
             };
 
             var accessTokenString = _tokensGenerator.GenerateAccessToken(claims);
