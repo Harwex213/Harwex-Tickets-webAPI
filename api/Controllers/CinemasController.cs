@@ -1,107 +1,170 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using api.Controllers.Abstract;
 using api.ViewModel;
-using AutoMapper;
-using Domain.Entities;
-using Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Service.Exceptions;
+using Service.Models.Cinema;
+using Service.Models.Hall;
+using Service.Services;
 
 namespace api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CinemasController : ControllerBase
+    public class CinemasController : ExceptionHandlerController
     {
-        private readonly IMapper _cinemasMapper;
         private readonly ICinemasService _cinemasService;
 
-        public CinemasController(ICinemasService cinemasService, IMapper cinemasMapper)
+        public CinemasController(ICinemasService cinemasService)
         {
             _cinemasService = cinemasService;
-            _cinemasMapper = cinemasMapper;
         }
 
         // GET: api/Cinemas
         [HttpGet]
-        public IActionResult GetCinemas()
+        public ActionResult<IEnumerable<CinemaResponseModel>> GetCinemas()
         {
             try
             {
-                var cinemas = _cinemasService.GetAll();
-                return Ok(cinemas.Select(cinema => _cinemasMapper.Map<CinemaGetResponse>(cinema)));
+                return Ok(_cinemasService.GetAll());
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return AnalyzeException(e);
             }
         }
 
         // GET: api/Cinemas/5
         [HttpGet("{id:long}")]
-        public IActionResult GetCinema(long id)
+        public ActionResult<CinemaResponseModel> GetCinema(long id)
         {
             try
             {
-                var cinema = _cinemasService.Get(id);
-                if (cinema == null) return NotFound();
-                return Ok(_cinemasMapper.Map<CinemaGetResponse>(cinema));
+                var cinemaResponseModel = _cinemasService.Get(id);
+                if (cinemaResponseModel == null)
+                {
+                    return NotFound(new ErrorResponse("Not Found"));
+                }
+
+                return Ok(cinemaResponseModel);
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return AnalyzeException(e);
             }
         }
 
         // POST: api/Cinemas
+        [Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<IActionResult> PostCinema([FromBody] CinemaCreateRequest cinemaCreateRequest)
+        public async Task<ActionResult<CreateCinemaResponseModel>> PostCinema(
+            [FromBody] CreateCinemaModel createCinemaModel)
         {
             try
             {
-                var cinema = _cinemasMapper.Map<Cinema>(cinemaCreateRequest);
-                await _cinemasService.AddAsync(cinema);
-                var response = CreatedAtAction(nameof(GetCinema), new {id = cinema.Id},
-                    _cinemasMapper.Map<CinemaCreateResponse>(cinema));
-                return response;
+                var cinemaResponseModel = await _cinemasService.AddAsync(createCinemaModel);
+                return CreatedAtAction(nameof(GetCinema), new {id = cinemaResponseModel.Id},
+                    cinemaResponseModel);
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return AnalyzeException(e);
+            }
+        }
+        
+        // POST: api/Cinemas/halls
+        [Authorize(Roles = "admin")]
+        [HttpPost("halls")]
+        public async Task<ActionResult<CreateHallResponseModel>> PostHall(
+            [FromBody] CreateHallModel createHallModel)
+        {
+            try
+            {
+                var hallResponseModel = await _cinemasService.AddHallAsync(createHallModel);
+                return CreatedAtAction(nameof(GetCinema), new {id = hallResponseModel.Id},
+                    hallResponseModel);
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
             }
         }
 
         // PUT: api/Cinemas/5
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:long}")]
-        public async Task<IActionResult> PutCinema(long id, [FromBody] CinemaUpdateRequest cinemaUpdateRequest)
+        public async Task<ActionResult<SuccessResponse>> PutCinema(long id,
+            [FromBody] UpdateCinemaModel updateCinemaModel)
         {
             try
             {
-                if (id != cinemaUpdateRequest.Id) return BadRequest();
-                var cinema = _cinemasMapper.Map<Cinema>(cinemaUpdateRequest);
-                await _cinemasService.UpdateAsync(cinema);
-                return NoContent();
+                if (id != updateCinemaModel.Id)
+                {
+                    return BadRequest(new ErrorResponse("Id must match"));
+                }
+
+                await _cinemasService.UpdateAsync(updateCinemaModel);
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                return BadRequest();
+                return AnalyzeException(e);
+            }
+        }
+        
+        // PUT: api/Cinemas/halls/5
+        [Authorize(Roles = "admin")]
+        [HttpPut("halls/{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> PutHall(long id,
+            [FromBody] UpdateHallModel updateHallModel)
+        {
+            try
+            {
+                if (id != updateHallModel.Id)
+                {
+                    return BadRequest(new ErrorResponse("Id must match"));
+                }
+
+                await _cinemasService.UpdateHallAsync(updateHallModel);
+                return Ok(new SuccessResponse());
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
             }
         }
 
         // DELETE: api/Cinemas/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCinema(int id)
+        [Authorize(Roles = "admin")]
+        [HttpDelete("{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> DeleteCinema(long id)
         {
             try
             {
                 await _cinemasService.DeleteAsync(id);
-                return Ok();
+                return Ok(new SuccessResponse());
             }
             catch (Exception e)
             {
-                if (e is NotFoundException) return NotFound();
-                return BadRequest();
+                return AnalyzeException(e);
+            }
+        }
+        
+        // DELETE: api/Cinemas/halls/5
+        [Authorize(Roles = "admin")]
+        [HttpDelete("halls/{id:long}")]
+        public async Task<ActionResult<SuccessResponse>> DeleteHall(long id)
+        {
+            try
+            {
+                await _cinemasService.DeleteHallAsync(id);
+                return Ok(new SuccessResponse());
+            }
+            catch (Exception e)
+            {
+                return AnalyzeException(e);
             }
         }
     }

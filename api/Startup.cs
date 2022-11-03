@@ -1,3 +1,4 @@
+using System.Linq;
 using api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,16 +22,17 @@ namespace api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCorsPolicies();
-            
-            services.AddControllers();
+
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddDatabase(Configuration);
             services.AddJwtTokenAuthentication(Configuration);
             services.AddServices();
-            services.AddAutoMapper(typeof(ApiMappingProfile));
+            services.AddAutoMapperProfiles();
 
             services.AddSwaggerGen(c =>
             {
+                c.ResolveConflictingActions(d => d.First());
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "HarwexTicketsAPI", Version = "v1"});
             });
         }
@@ -47,7 +49,7 @@ namespace api
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            
+
             app.UseCors();
 
             app.UseAuthentication();

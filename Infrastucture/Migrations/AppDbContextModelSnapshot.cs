@@ -42,37 +42,6 @@ namespace Infrastucture.Migrations
                     b.ToTable("Cinemas");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CinemaMovie", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CinemaId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("MovieId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CinemaId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("CinemaMovies");
-                });
-
             modelBuilder.Entity("Domain.Entities.City", b =>
                 {
                     b.Property<long>("Id")
@@ -104,8 +73,14 @@ namespace Infrastucture.Migrations
                     b.Property<long>("CinemaId")
                         .HasColumnType("bigint");
 
+                    b.Property<short>("ColsAmount")
+                        .HasColumnType("smallint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<short>("RowsAmount")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -124,6 +99,9 @@ namespace Infrastucture.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Genre")
                         .HasColumnType("nvarchar(max)");
 
@@ -132,6 +110,9 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -197,54 +178,11 @@ namespace Infrastucture.Migrations
                     b.Property<int>("Row")
                         .HasColumnType("int");
 
-                    b.Property<string>("SeatTypeName")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("HallId");
 
-                    b.HasIndex("SeatTypeName");
-
                     b.ToTable("Seats");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SeatType", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SeatTypes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Service", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Domain.Entities.Session", b =>
@@ -254,81 +192,28 @@ namespace Infrastucture.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("CinemaMovieId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("HallId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<long>("MovieId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("money");
+
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CinemaMovieId");
-
                     b.HasIndex("HallId");
 
+                    b.HasIndex("MovieId");
+
                     b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SessionSeatPrice", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("money");
-
-                    b.Property<string>("SeatTypeName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<long>("SessionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SeatTypeName");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("SessionSeatPrices");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SessionService", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("money");
-
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<long>("SessionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceName");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("SessionServices");
                 });
 
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
@@ -344,10 +229,7 @@ namespace Infrastucture.Migrations
                     b.Property<long>("SeatId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("SessionSeatPriceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SessionServiceId")
+                    b.Property<long>("SessionId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
@@ -357,9 +239,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("SeatId");
 
-                    b.HasIndex("SessionSeatPriceId");
-
-                    b.HasIndex("SessionServiceId");
+                    b.HasIndex("SessionId");
 
                     b.HasIndex("UserId");
 
@@ -406,25 +286,6 @@ namespace Infrastucture.Migrations
                     b.Navigation("City");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CinemaMovie", b =>
-                {
-                    b.HasOne("Domain.Entities.Cinema", "Cinema")
-                        .WithMany("CinemaMovies")
-                        .HasForeignKey("CinemaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Movie", "Movie")
-                        .WithMany("CinemaMovies")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Cinema");
-
-                    b.Navigation("Movie");
-                });
-
             modelBuilder.Entity("Domain.Entities.Hall", b =>
                 {
                     b.HasOne("Domain.Entities.Cinema", "Cinema")
@@ -444,65 +305,26 @@ namespace Infrastucture.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.SeatType", "SeatType")
-                        .WithMany("Seats")
-                        .HasForeignKey("SeatTypeName")
-                        .HasPrincipalKey("Name");
-
                     b.Navigation("Hall");
-
-                    b.Navigation("SeatType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Session", b =>
                 {
-                    b.HasOne("Domain.Entities.CinemaMovie", null)
-                        .WithMany("Sessions")
-                        .HasForeignKey("CinemaMovieId");
-
                     b.HasOne("Domain.Entities.Hall", "Hall")
                         .WithMany("Sessions")
                         .HasForeignKey("HallId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.Movie", "Movie")
+                        .WithMany("Sessions")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Hall");
-                });
 
-            modelBuilder.Entity("Domain.Entities.SessionSeatPrice", b =>
-                {
-                    b.HasOne("Domain.Entities.SeatType", "SeatType")
-                        .WithMany("SessionSeatPrices")
-                        .HasForeignKey("SeatTypeName")
-                        .HasPrincipalKey("Name");
-
-                    b.HasOne("Domain.Entities.Session", "Session")
-                        .WithMany("SessionSeatPrices")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SeatType");
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SessionService", b =>
-                {
-                    b.HasOne("Domain.Entities.Service", "Service")
-                        .WithMany("SessionServices")
-                        .HasForeignKey("ServiceName")
-                        .HasPrincipalKey("Name");
-
-                    b.HasOne("Domain.Entities.Session", "Session")
-                        .WithMany("SessionServices")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Service");
-
-                    b.Navigation("Session");
+                    b.Navigation("Movie");
                 });
 
             modelBuilder.Entity("Domain.Entities.Ticket", b =>
@@ -513,15 +335,9 @@ namespace Infrastucture.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.SessionSeatPrice", "SessionSeatPrice")
+                    b.HasOne("Domain.Entities.Session", "SessionSeatPrice")
                         .WithMany("Tickets")
-                        .HasForeignKey("SessionSeatPriceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.SessionService", "SessionService")
-                        .WithMany("Tickets")
-                        .HasForeignKey("SessionServiceId")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -534,8 +350,6 @@ namespace Infrastucture.Migrations
                     b.Navigation("Seat");
 
                     b.Navigation("SessionSeatPrice");
-
-                    b.Navigation("SessionService");
 
                     b.Navigation("User");
                 });
@@ -552,14 +366,7 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entities.Cinema", b =>
                 {
-                    b.Navigation("CinemaMovies");
-
                     b.Navigation("Halls");
-                });
-
-            modelBuilder.Entity("Domain.Entities.CinemaMovie", b =>
-                {
-                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("Domain.Entities.City", b =>
@@ -576,7 +383,7 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entities.Movie", b =>
                 {
-                    b.Navigation("CinemaMovies");
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
@@ -589,31 +396,7 @@ namespace Infrastucture.Migrations
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SeatType", b =>
-                {
-                    b.Navigation("Seats");
-
-                    b.Navigation("SessionSeatPrices");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Service", b =>
-                {
-                    b.Navigation("SessionServices");
-                });
-
             modelBuilder.Entity("Domain.Entities.Session", b =>
-                {
-                    b.Navigation("SessionSeatPrices");
-
-                    b.Navigation("SessionServices");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SessionSeatPrice", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SessionService", b =>
                 {
                     b.Navigation("Tickets");
                 });
